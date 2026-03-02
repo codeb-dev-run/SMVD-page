@@ -1,11 +1,10 @@
 import { z } from 'zod';
 
+// Only validate env vars actually accessed via `env.*`.
+// Prisma manages DATABASE_URL internally — no need to duplicate here.
 const envSchema = z.object({
-  DATABASE_URL: z.string().min(1),
   NEXTAUTH_SECRET: z.string().min(1),
-  NEXTAUTH_URL: z.string().url().optional(),
   BLOB_READ_WRITE_TOKEN: z.string().optional(),
-  NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
 });
 
 type Env = z.infer<typeof envSchema>;
