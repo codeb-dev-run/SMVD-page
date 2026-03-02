@@ -18,7 +18,7 @@ import {
 } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Trash2, Pencil, Eye, EyeOff, Link as LinkIcon } from 'lucide-react';
+import { GripVertical, Trash2, Pencil, Eye, EyeOff, ExternalLink } from 'lucide-react';
 import type { NewsArticleData } from '@/hooks/useNewsEditor';
 
 interface NewsArticleListProps {
@@ -117,7 +117,7 @@ function SortableArticleItem({
           className="p-2 text-gray-500 hover:text-purple-500 hover:bg-purple-50 rounded transition-colors"
           title="미리보기"
         >
-          <LinkIcon size={18} />
+          <ExternalLink size={18} />
         </button>
         <button
           onClick={() => onTogglePublish(item)}

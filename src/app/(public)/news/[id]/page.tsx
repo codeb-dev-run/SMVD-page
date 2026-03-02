@@ -100,7 +100,15 @@ async function getNewsDetail(slug: string): Promise<NewsDetailResult> {
       };
 
       // Normalize attachments (server-side, before passing to client)
-      if (baseData.attachments) {
+      // attachments may be a JSON string from DB - parse it first
+      if (baseData.attachments && typeof baseData.attachments === 'string') {
+        try {
+          baseData.attachments = JSON.parse(baseData.attachments);
+        } catch {
+          baseData.attachments = null;
+        }
+      }
+      if (Array.isArray(baseData.attachments)) {
         baseData.attachments = baseData.attachments.map((a) => ({
           ...a,
           filepath: normalizeMediaUrl(a.filepath) ?? a.filepath,

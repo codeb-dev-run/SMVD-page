@@ -18,7 +18,7 @@ import {
 } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Trash2, Pencil, Link as LinkIcon } from 'lucide-react';
+import { GripVertical, Trash2, Pencil, ExternalLink } from 'lucide-react';
 import type { WorkProjectData } from '@/hooks/useWorkEditor';
 
 interface WorkProjectListProps {
@@ -96,7 +96,7 @@ function SortableProjectItem({
           className="p-2 text-gray-500 hover:text-purple-500 hover:bg-purple-50 rounded transition-colors"
           title="미리보기"
         >
-          <LinkIcon size={18} />
+          <ExternalLink size={18} />
         </button>
         <button
           onClick={() => onEdit(item)}
