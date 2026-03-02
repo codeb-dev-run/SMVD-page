@@ -8,4 +8,16 @@ const envSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
 });
 
-export const env = envSchema.parse(process.env);
+type Env = z.infer<typeof envSchema>;
+
+let _env: Env | null = null;
+
+/** Lazy-validated environment — only validates on first runtime access, not at build time */
+export const env: Env = new Proxy({} as Env, {
+  get(_, key: string) {
+    if (!_env) {
+      _env = envSchema.parse(process.env);
+    }
+    return _env[key as keyof Env];
+  },
+});
