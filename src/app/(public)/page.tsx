@@ -28,7 +28,6 @@ export default async function HomePage() {
                 orderBy: { order: 'asc' },
                 include: {
                   media: true,
-                  workProject: { select: { slug: true } },
                 },
               },
             },
@@ -68,12 +67,26 @@ export default async function HomePage() {
     })) || [];
 
     // Map work portfolios to component props
+    // Fetch workProject slugs separately to avoid failure if migration not applied
+    let slugMap: Record<string, string> = {};
+    try {
+      const portfoliosWithProject = await prisma.workPortfolio.findMany({
+        where: { sectionId: workSection?.id ?? '' },
+        select: { id: true, workProject: { select: { slug: true } } },
+      });
+      for (const p of portfoliosWithProject) {
+        if (p.workProject?.slug) slugMap[p.id] = p.workProject.slug;
+      }
+    } catch {
+      // workProject relation may not exist yet — safe to ignore
+    }
+
     const workItems = workSection?.workPortfolios?.map((item) => ({
       src: normalizeMediaUrl(item.media?.filepath) || '',
       alt: item.media?.filename || item.title,
       title: item.title,
       category: item.category,
-      slug: item.workProject?.slug ?? null,
+      slug: slugMap[item.id] ?? null,
     })) || [];
 
     // Extract about content
