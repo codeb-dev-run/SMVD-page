@@ -54,16 +54,14 @@ export default function HomePageContent({
 }: HomePageContentProps) {
   return (
     <div>
-      {/* Header */}
+      {/* Header (Figma: opacity 0.7 navigation) */}
       <Header navigation={navigation} headerConfig={headerConfig} />
 
       {/* Video Hero */}
       <VideoHero />
 
       {/* Main Content Container - Responsive */}
-      <div
-        className="max-w-[1360px] mx-auto px-5 sm:px-10 lg:px-[55.5px]"
-      >
+      <div className="max-w-[1360px] mx-auto px-5 sm:px-10 lg:px-[55.5px]">
         {/* Exhibition Section */}
         <ExhibitionSection items={exhibitionItems} />
       </div>

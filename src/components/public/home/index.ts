@@ -7,3 +7,4 @@ export { default as NavigationSection } from './NavigationSection';
 export { default as AboutSection } from './AboutSection';
 export { default as WorkSection } from './WorkSection';
 export { default as Footer } from './Footer';
+export { default as LoadingScreen } from './LoadingScreen';

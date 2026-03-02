@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
+import { gsap } from '@/lib/gsap';
 
 interface NavigationItem {
   id: string;
@@ -22,6 +23,7 @@ interface HeaderConfig {
 interface HeaderProps {
   navigation?: NavigationItem[];
   headerConfig?: HeaderConfig;
+  animateOnMount?: boolean;
 }
 
 // 기본 메뉴 (CMS 연동 없을 때)
@@ -32,9 +34,25 @@ const DEFAULT_NAV_ITEMS = [
   { label: 'News&Event', href: '/news' },
 ];
 
-export function Header({ navigation, headerConfig }: HeaderProps) {
+export function Header({ navigation, headerConfig, animateOnMount = true }: HeaderProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const el = headerRef.current;
+    if (!el) return;
+
+    // Set initial hidden state
+    gsap.set(el, { y: -20, opacity: 0 });
+
+    // Don't animate until loading screen is done
+    if (!animateOnMount) return;
+
+    const tween = gsap.to(el, { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out', delay: 0.1 });
+    return () => { tween.kill(); };
+  }, [animateOnMount]);
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -48,6 +66,7 @@ export function Header({ navigation, headerConfig }: HeaderProps) {
 
   return (
     <header
+      ref={headerRef}
       className="w-full h-[64px] sm:h-[72px] lg:h-[80px] bg-[#ffffffff] flex items-center px-5 sm:px-10 lg:px-[55.5px]"
     >
       {/* Logo */}

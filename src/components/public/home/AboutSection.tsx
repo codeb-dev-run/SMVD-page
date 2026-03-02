@@ -1,6 +1,6 @@
 'use client';
 
-
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 interface AboutSectionProps {
   title?: string;
@@ -11,6 +11,7 @@ export default function AboutSection({
   title = 'About SMVD',
   content = '',
 }: AboutSectionProps) {
+  const sectionRef = useScrollReveal({ selector: '[data-about-text]', stagger: 0.15, y: 40, start: 'top 75%' });
 
   return (
     <section id="about" className="w-full bg-[#ffffffff] flex flex-col">
@@ -29,7 +30,7 @@ export default function AboutSection({
       </div>
 
       {/* Content Container with Gray Background */}
-      <div className="w-full bg-[#f0f0f0ff] pt-10 sm:pt-[60px] lg:pt-20 pb-10 sm:pb-[60px] lg:pb-20 px-5 sm:px-6 lg:px-10">
+      <div ref={sectionRef} className="w-full bg-[#f0f0f0ff] pt-10 sm:pt-[60px] lg:pt-20 pb-10 sm:pb-[60px] lg:pb-20 px-5 sm:px-6 lg:px-10">
         <div className="max-w-[1360px] mx-auto flex items-center justify-center flex-col gap-1 sm:gap-2">
           {content ? (
             // Display content from database
@@ -40,7 +41,7 @@ export default function AboutSection({
             // Display default hardcoded content
             <>
               {/* Line 1: FROM VISUAL DELIVERY + icon */}
-              <div className="flex items-center justify-center gap-2 text-[20px] sm:text-[28px] lg:text-[40px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif]">
+              <div data-about-text className="flex items-center justify-center gap-2 text-[20px] sm:text-[28px] lg:text-[40px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif]">
                 FROM VISUAL DELIVERY
                 <svg
                   className="w-6 h-6 sm:w-7 sm:h-7 lg:w-[36px] lg:h-[36px] shrink-0"
@@ -56,7 +57,7 @@ export default function AboutSection({
               </div>
 
               {/* Line 2: icon + TO SYSTEMIC SOLUTIONS */}
-              <div className="flex items-center justify-center gap-2 text-[20px] sm:text-[28px] lg:text-[40px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif]">
+              <div data-about-text className="flex items-center justify-center gap-2 text-[20px] sm:text-[28px] lg:text-[40px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif]">
                 <svg
                   className="w-6 h-6 sm:w-7 sm:h-7 lg:w-[36px] lg:h-[36px] shrink-0"
                   viewBox="0 0 50 56"
@@ -72,7 +73,7 @@ export default function AboutSection({
               </div>
 
               {/* Line 3: SOLVING + icon + PROBLEMS, */}
-              <div className="flex items-center justify-center gap-2 text-[20px] sm:text-[28px] lg:text-[40px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif]">
+              <div data-about-text className="flex items-center justify-center gap-2 text-[20px] sm:text-[28px] lg:text-[40px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif]">
                 SOLVING
                 <svg
                   className="w-6 h-6 sm:w-7 sm:h-7 lg:w-[36px] lg:h-[36px] shrink-0"
@@ -89,7 +90,7 @@ export default function AboutSection({
               </div>
 
               {/* Line 4: SHAPING THE FUTURE OF VISUALS */}
-              <div className="text-[20px] sm:text-[28px] lg:text-[40px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif] m-0">
+              <div data-about-text className="text-[20px] sm:text-[28px] lg:text-[40px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif] m-0">
                 SHAPING THE FUTURE OF VISUALS
               </div>
             </>

@@ -1,6 +1,7 @@
 'use client';
 
 import { Instagram, Youtube, Facebook, Twitter, Linkedin } from 'lucide-react';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 interface FooterData {
   title?: string;
@@ -40,6 +41,8 @@ const SOCIAL_ICON_MAP = {
 type SocialPlatform = keyof typeof SOCIAL_ICON_MAP;
 
 export function Footer({ data, socialLinks }: FooterProps) {
+  const footerRef = useScrollReveal({ y: 40, duration: 0.8 });
+
   const title = data?.title ?? '숙명여자대학교 미술대학 시각영상디자인학과';
   const description = data?.description ?? 'University of Sookmyung Women, Visual Media Design';
   const address = data?.address ?? '서울 특별시 용산구 청파로 47길 100 숙명여자대학교 시각영상디자인과 (미술대학 201호)';
@@ -55,6 +58,7 @@ export function Footer({ data, socialLinks }: FooterProps) {
 
   return (
     <footer
+      ref={footerRef}
       className="w-full bg-[#ebeef4ff] border-t border-[#e5e7ebff] px-5 sm:px-10 lg:px-[55.5px]"
     >
       <div

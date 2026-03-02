@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import { gsap } from '@/lib/gsap';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 interface WorkItem {
   src: string;
@@ -35,6 +37,16 @@ export default function WorkSection({
   items = workItems,
 }: WorkSectionProps) {
   const [activeCategory, setActiveCategory] = useState('All');
+  const gridRef = useScrollReveal({ selector: '[data-work-card]', stagger: 0.1, y: 50 });
+
+  const handleCardEnter = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    gsap.to(e.currentTarget, { y: -8, boxShadow: '0 12px 40px rgba(0,0,0,0.1)', duration: 0.3, ease: 'power2.out' });
+  }, []);
+
+  const handleCardLeave = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    gsap.to(e.currentTarget, { y: 0, boxShadow: '0 0px 0px rgba(0,0,0,0)', duration: 0.25, ease: 'power2.out' });
+  }, []);
 
   const filteredItems = activeCategory === 'All'
     ? items
@@ -94,7 +106,7 @@ export default function WorkSection({
         </div>
 
         {/* Grid: 3-col on desktop (col1=cards, col2=filter sticky, col3=cards), 2-col tablet, 1-col mobile */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr] gap-x-0 sm:gap-x-8 lg:gap-x-[50px] gap-y-6 sm:gap-y-8 lg:gap-y-10">
+        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr] gap-x-0 sm:gap-x-8 lg:gap-x-[50px] gap-y-6 sm:gap-y-8 lg:gap-y-10">
           {/* Desktop: center filter in grid col 2, sticky */}
           <div
             className="hidden lg:flex flex-col gap-[2px] col-start-2 sticky top-[100px] self-start pt-1"
@@ -107,7 +119,10 @@ export default function WorkSection({
           {filteredItems.map((item, idx) => (
             <div
               key={item.title}
-              className="flex flex-col lg:col-(--desk-col) lg:row-(--desk-row)"
+              data-work-card
+              onMouseEnter={handleCardEnter}
+              onMouseLeave={handleCardLeave}
+              className="flex flex-col lg:col-(--desk-col) lg:row-(--desk-row) cursor-pointer"
               style={{
                 '--desk-col': idx % 2 === 0 ? '1' : '3',
                 '--desk-row': `${Math.floor(idx / 2) + 1}`,

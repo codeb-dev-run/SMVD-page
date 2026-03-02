@@ -2,7 +2,8 @@
 
 import { useRef, useEffect, useCallback, useState } from 'react';
 import Image from 'next/image';
-import gsap from 'gsap';
+import { gsap } from '@/lib/gsap';
+import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 interface ExhibitionItem {
   year: string;
@@ -33,6 +34,7 @@ export default function ExhibitionSection({
     },
   ],
 }: ExhibitionSectionProps) {
+  const sectionRef = useScrollReveal({ y: 40, duration: 0.8, start: 'top 85%' });
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const dragState = useRef({
@@ -142,6 +144,21 @@ export default function ExhibitionSection({
     animateTo(targetX, Math.abs(momentum) > 500 ? 0.6 : 0.4);
   }, [getCurrentTranslate, animateTo]);
 
+  // Card hover animation (scale 1.03)
+  const handleCardEnter = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (isDragging) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const img = e.currentTarget.querySelector('[data-exhibition-img]');
+    if (!img) return;
+    gsap.to(img, { scale: 1.03, duration: 0.4, ease: 'power2.out' });
+  }, [isDragging]);
+
+  const handleCardLeave = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const img = e.currentTarget.querySelector('[data-exhibition-img]');
+    if (!img) return;
+    gsap.to(img, { scale: 1, duration: 0.3, ease: 'power2.out' });
+  }, []);
+
   // Prevent default drag on images
   useEffect(() => {
     const track = trackRef.current;
@@ -152,7 +169,7 @@ export default function ExhibitionSection({
   }, []);
 
   return (
-    <section id="exhibition" className="flex flex-col gap-5 sm:gap-6 lg:gap-10 w-full mb-10 sm:mb-[60px] lg:mb-20">
+    <section ref={sectionRef} id="exhibition" className="flex flex-col gap-5 sm:gap-6 lg:gap-10 w-full mb-10 sm:mb-[60px] lg:mb-20">
       {/* Exhibition Header */}
       <div className="flex justify-between items-center border-b border-[#141414ff] pb-5">
         <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-bold font-['Helvetica'] text-[#141414ff] m-0">
@@ -184,7 +201,9 @@ export default function ExhibitionSection({
           {items.map((item, idx) => (
             <div
               key={idx}
-              className="flex-none flex flex-col gap-5 select-none w-full sm:w-[calc(50%-12px)] lg:w-[calc((100%-80px)/3)]"
+              className="flex-none flex flex-col gap-5 select-none w-full sm:w-[calc(50%-12px)] lg:w-[calc((100%-80px)/3)] cursor-pointer"
+              onMouseEnter={handleCardEnter}
+              onMouseLeave={handleCardLeave}
             >
                 {/* Year Indicator */}
                 <div className="flex items-center gap-3">
@@ -209,7 +228,7 @@ export default function ExhibitionSection({
                 </div>
 
                 {/* Exhibition Image */}
-                <div className="relative w-full aspect-9/13 bg-[#f5f5f5ff] overflow-hidden rounded-none">
+                <div data-exhibition-img className="relative w-full aspect-9/13 bg-[#f5f5f5ff] overflow-hidden rounded-none">
                   <Image
                     src={item.src}
                     alt={item.alt}
