@@ -1,8 +1,8 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
-export const middleware = withAuth(
-  function middleware(req) {
+export const proxy = withAuth(
+  function proxy(req) {
     // 관리자 페이지 접근 시 역할 확인
     if (req.nextUrl.pathname.startsWith("/admin")) {
       const token = req.nextauth.token;
