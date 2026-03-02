@@ -24,12 +24,9 @@ export default async function HomePage() {
                 orderBy: { order: 'asc' },
                 include: { media: true },
               },
-              workPortfolios: {
-                orderBy: { order: 'asc' },
-                include: {
-                  media: true,
-                },
-              },
+              // workPortfolios fetched separately — the work_project_id column
+              // may not exist on production DB if migration hasn't been applied yet.
+              // Prisma default-selects all scalar fields, which would cause a query error.
             },
           },
         },
@@ -66,28 +63,48 @@ export default async function HomePage() {
       title: item.media?.altText || `${item.year} Exhibition`,
     })) || [];
 
-    // Map work portfolios to component props
-    // Fetch workProject slugs separately to avoid failure if migration not applied
-    let slugMap: Record<string, string> = {};
-    try {
-      const portfoliosWithProject = await prisma.workPortfolio.findMany({
-        where: { sectionId: workSection?.id ?? '' },
-        select: { id: true, workProject: { select: { slug: true } } },
-      });
-      for (const p of portfoliosWithProject) {
-        if (p.workProject?.slug) slugMap[p.id] = p.workProject.slug;
+    // Fetch work portfolios separately with explicit select to avoid work_project_id column issue
+    let workPortfolioRows: Array<{ id: string; title: string; category: string; media: { filepath: string | null; filename: string } | null }> = [];
+    if (workSection?.id) {
+      try {
+        workPortfolioRows = await prisma.workPortfolio.findMany({
+          where: { sectionId: workSection.id },
+          orderBy: { order: 'asc' },
+          select: {
+            id: true,
+            title: true,
+            category: true,
+            media: { select: { filepath: true, filename: true } },
+          },
+        });
+      } catch {
+        // Fallback if work_portfolios table has schema mismatch
       }
-    } catch {
-      // workProject relation may not exist yet — safe to ignore
     }
 
-    const workItems = workSection?.workPortfolios?.map((item) => ({
+    // Try to fetch workProject slugs (may fail if migration not applied)
+    let slugMap: Record<string, string> = {};
+    if (workSection?.id) {
+      try {
+        const portfoliosWithProject = await prisma.workPortfolio.findMany({
+          where: { sectionId: workSection.id },
+          select: { id: true, workProject: { select: { slug: true } } },
+        });
+        for (const p of portfoliosWithProject) {
+          if (p.workProject?.slug) slugMap[p.id] = p.workProject.slug;
+        }
+      } catch {
+        // workProject relation may not exist yet — safe to ignore
+      }
+    }
+
+    const workItems = workPortfolioRows.map((item) => ({
       src: normalizeMediaUrl(item.media?.filepath) || '',
       alt: item.media?.filename || item.title,
       title: item.title,
       category: item.category,
       slug: slugMap[item.id] ?? null,
-    })) || [];
+    }));
 
     // Extract about content
     const aboutContent = typeof aboutSection?.content === 'object' && aboutSection?.content
