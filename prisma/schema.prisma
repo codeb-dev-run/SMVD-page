@@ -142,20 +142,23 @@ model ExhibitionItem {
 
 // Work portfolio items (for Home page)
 model WorkPortfolio {
-  id        String   @id @default(cuid())
-  sectionId String   @map("section_id")
-  section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
-  title     String
-  category  String
-  mediaId   String   @map("media_id")
-  media     Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
-  order     Int      @default(0)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id            String       @id @default(cuid())
+  sectionId     String       @map("section_id")
+  section       Section      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  title         String
+  category      String
+  mediaId       String       @map("media_id")
+  media         Media        @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  workProjectId String?      @map("work_project_id")
+  workProject   WorkProject? @relation(fields: [workProjectId], references: [id], onDelete: SetNull)
+  order         Int          @default(0)
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
 
   @@unique([sectionId, order])
   @@index([sectionId])
   @@index([mediaId])
+  @@index([workProjectId])
   @@map("work_portfolios")
 }
 
@@ -206,24 +209,25 @@ model Work {
 
 // Work 프로젝트 (포트폴리오 아카이브 - NEW 2026-02-15)
 model WorkProject {
-  id             String   @id @default(cuid())
-  slug           String   @unique // URL용 (기존 '1', '2', ... '12')
+  id             String          @id @default(cuid())
+  slug           String          @unique // URL용
   title          String // 'Vora', 'Mindit', etc.
   subtitle       String // '권나연 외 3명, 2025'
   category       String // 'UX/UI', 'Branding', 'Motion', 'Game'
   tags           String[] // PostgreSQL 배열
   author         String // 작가명
   email          String // 이메일
-  description    String   @default("") // 프로젝트 설명
-  year           String   @default("2025") // 연도
-  heroImage      String   @map("hero_image") // 상세 히어로 이미지 경로
-  thumbnailImage String   @map("thumbnail_image") // 목록 썸네일 경로
-  galleryImages  Json     @default("[]") @map("gallery_images") // 갤러리 이미지 배열
+  description    String          @default("") // 프로젝트 설명
+  year           String          @default("2025") // 연도
+  heroImage      String          @map("hero_image") // 상세 히어로 이미지 경로
+  thumbnailImage String          @map("thumbnail_image") // 목록 썸네일 경로
+  galleryImages  Json            @default("[]") @map("gallery_images") // 갤러리 이미지 배열
   content        Json? // BlockEditor 컨텐츠 (블록 배열)
-  order          Int      @default(0) // 표시 순서
-  published      Boolean  @default(true) // 공개 여부
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  order          Int             @default(0) // 표시 순서
+  published      Boolean         @default(true) // 공개 여부
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+  workPortfolios WorkPortfolio[] // 홈페이지 포트폴리오 역참조
 
   @@index([category])
   @@index([order])

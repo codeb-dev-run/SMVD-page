@@ -28,9 +28,25 @@ export interface WorkDetail {
   };
 }
 
+// Legacy numeric slug → new slug mapping (이전 URL 호환용)
+export const LEGACY_SLUG_MAP: Record<string, string> = {
+  '1': 'vora',
+  '2': 'mindit',
+  '3': 'starnew-valley',
+  '4': 'pave',
+  '5': 'bolio',
+  '6': 'mist-away',
+  '7': 'bichae',
+  '8': 'morae',
+  '9': 'studio-knot',
+  '10': 'blome',
+  '11': 'alors',
+  '12': '고군분투',
+};
+
 export const workDetails: Record<string, WorkDetail> = {
-  '1': {
-    id: '1',
+  'vora': {
+    id: 'vora',
     title: 'Vora',
     subtitle: '권나연 외 3명, 2025',
     category: 'UX/UI',
@@ -45,16 +61,16 @@ export const workDetails: Record<string, WorkDetail> = {
       '/images/work/vora/gallery-3.png',
     ],
     previousProject: {
-      id: '12',
+      id: '고군분투',
       title: '고군분투',
     },
     nextProject: {
-      id: '2',
+      id: 'mindit',
       title: 'Mindit',
     },
   },
-  '2': {
-    id: '2',
+  'mindit': {
+    id: 'mindit',
     title: 'Mindit',
     subtitle: '도인영 외 3명, 2025',
     category: 'UX/UI',
@@ -69,16 +85,16 @@ export const workDetails: Record<string, WorkDetail> = {
       '/images/work/mindit/gallery-3.png',
     ],
     previousProject: {
-      id: '1',
+      id: 'vora',
       title: 'Vora',
     },
     nextProject: {
-      id: '3',
+      id: 'starnew-valley',
       title: 'StarNew Valley',
     },
   },
-  '3': {
-    id: '3',
+  'starnew-valley': {
+    id: 'starnew-valley',
     title: 'StarNew Valley',
     subtitle: '안시현 외 3명, 2025',
     category: 'Game',
@@ -93,16 +109,16 @@ export const workDetails: Record<string, WorkDetail> = {
       '/images/work/starnewvalley/gallery-3.png',
     ],
     previousProject: {
-      id: '2',
+      id: 'mindit',
       title: 'Mindit',
     },
     nextProject: {
-      id: '4',
+      id: 'pave',
       title: 'Pave',
     },
   },
-  '4': {
-    id: '4',
+  'pave': {
+    id: 'pave',
     title: 'Pave',
     subtitle: '박지우 외 2명, 2025',
     category: 'UX/UI',
@@ -117,16 +133,16 @@ export const workDetails: Record<string, WorkDetail> = {
       '/images/work/pave/gallery-3.png',
     ],
     previousProject: {
-      id: '3',
+      id: 'starnew-valley',
       title: 'StarNew Valley',
     },
     nextProject: {
-      id: '5',
+      id: 'bolio',
       title: 'Bolio',
     },
   },
-  '5': {
-    id: '5',
+  'bolio': {
+    id: 'bolio',
     title: 'Bolio',
     subtitle: '박근영, 2025',
     category: 'UX/UI',
@@ -141,16 +157,16 @@ export const workDetails: Record<string, WorkDetail> = {
       '/images/work/bolio/gallery-3.png',
     ],
     previousProject: {
-      id: '4',
+      id: 'pave',
       title: 'Pave',
     },
     nextProject: {
-      id: '6',
+      id: 'mist-away',
       title: 'MIST AWAY',
     },
   },
-  '6': {
-    id: '6',
+  'mist-away': {
+    id: 'mist-away',
     title: 'MIST AWAY',
     subtitle: '신예지, 2025',
     category: 'UX/UI',
@@ -165,16 +181,16 @@ export const workDetails: Record<string, WorkDetail> = {
       '/images/work/mistaway/gallery-3.png',
     ],
     previousProject: {
-      id: '5',
+      id: 'bolio',
       title: 'Bolio',
     },
     nextProject: {
-      id: '7',
+      id: 'bichae',
       title: 'BICHAE',
     },
   },
-  '7': {
-    id: '7',
+  'bichae': {
+    id: 'bichae',
     title: 'BICHAE',
     subtitle: '최은정, 2025',
     category: 'Branding',
@@ -189,16 +205,16 @@ export const workDetails: Record<string, WorkDetail> = {
       '/images/work/bichae/gallery-3.png',
     ],
     previousProject: {
-      id: '6',
+      id: 'mist-away',
       title: 'MIST AWAY',
     },
     nextProject: {
-      id: '8',
+      id: 'morae',
       title: 'Morae',
     },
   },
-  '8': {
-    id: '8',
+  'morae': {
+    id: 'morae',
     title: 'Morae',
     subtitle: '고은서, 2023',
     category: 'UX/UI',
@@ -213,16 +229,16 @@ export const workDetails: Record<string, WorkDetail> = {
       '/images/work/morae/gallery-3.png',
     ],
     previousProject: {
-      id: '7',
+      id: 'bichae',
       title: 'BICHAE',
     },
     nextProject: {
-      id: '9',
+      id: 'studio-knot',
       title: 'STUDIO KNOT',
     },
   },
-  '9': {
-    id: '9',
+  'studio-knot': {
+    id: 'studio-knot',
     title: 'STUDIO KNOT',
     subtitle: '노하린, 2025',
     category: 'Branding',
@@ -243,16 +259,16 @@ export const workDetails: Record<string, WorkDetail> = {
       '/images/work/knot/gallery-8.png',
     ],
     previousProject: {
-      id: '8',
+      id: 'morae',
       title: 'Morae',
     },
     nextProject: {
-      id: '10',
+      id: 'blome',
       title: 'BLOMÉ',
     },
   },
-  '10': {
-    id: '10',
+  'blome': {
+    id: 'blome',
     title: 'BLOMÉ',
     subtitle: '김진아 외 1명, 2025',
     category: 'Branding',
@@ -267,16 +283,16 @@ export const workDetails: Record<string, WorkDetail> = {
       '/images/work/blome/gallery-3.png',
     ],
     previousProject: {
-      id: '9',
+      id: 'studio-knot',
       title: 'STUDIO KNOT',
     },
     nextProject: {
-      id: '11',
+      id: 'alors',
       title: 'alors: romanticize your life, every...',
     },
   },
-  '11': {
-    id: '11',
+  'alors': {
+    id: 'alors',
     title: 'alors: romanticize your life, every...',
     subtitle: '정유진, 2025',
     category: 'Motion',
@@ -291,16 +307,16 @@ export const workDetails: Record<string, WorkDetail> = {
       '/images/work/alors/gallery-3.png',
     ],
     previousProject: {
-      id: '10',
+      id: 'blome',
       title: 'BLOMÉ',
     },
     nextProject: {
-      id: '12',
+      id: '고군분투',
       title: '고군분투',
     },
   },
-  '12': {
-    id: '12',
+  '고군분투': {
+    id: '고군분투',
     title: '고군분투',
     subtitle: '한다인, 2025',
     category: 'Motion',
@@ -315,12 +331,36 @@ export const workDetails: Record<string, WorkDetail> = {
       '/images/work/gogoonbunstu/gallery-3.png',
     ],
     previousProject: {
-      id: '11',
+      id: 'alors',
       title: 'alors: romanticize your life, every...',
     },
     nextProject: {
-      id: '1',
+      id: 'vora',
       title: 'Vora',
     },
+  },
+  'nightmare-in-neverland': {
+    id: 'nightmare-in-neverland',
+    title: 'Nightmare in Neverland',
+    subtitle: '작가명, 2025',
+    category: 'Motion',
+    tags: ['Motion'],
+    author: '작가명',
+    email: '',
+    description: '',
+    heroImage: '',
+    galleryImages: [],
+  },
+  '시도': {
+    id: '시도',
+    title: '시도',
+    subtitle: '작가명, 2025',
+    category: 'Graphic',
+    tags: ['Graphic'],
+    author: '작가명',
+    email: '',
+    description: '',
+    heroImage: '',
+    galleryImages: [],
   },
 };

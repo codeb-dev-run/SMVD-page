@@ -26,7 +26,10 @@ export default async function HomePage() {
               },
               workPortfolios: {
                 orderBy: { order: 'asc' },
-                include: { media: true },
+                include: {
+                  media: true,
+                  workProject: { select: { slug: true } },
+                },
               },
             },
           },
@@ -60,7 +63,8 @@ export default async function HomePage() {
     const exhibitionItems = exhibitionSection?.exhibitionItems?.map((item) => ({
       year: item.year,
       src: normalizeMediaUrl(item.media?.filepath) || '',
-      alt: item.media?.filename || `${item.year} exhibition`,
+      alt: item.media?.altText || item.media?.filename || `${item.year} exhibition`,
+      title: item.media?.altText || `${item.year} Exhibition`,
     })) || [];
 
     // Map work portfolios to component props
@@ -69,6 +73,7 @@ export default async function HomePage() {
       alt: item.media?.filename || item.title,
       title: item.title,
       category: item.category,
+      slug: item.workProject?.slug ?? null,
     })) || [];
 
     // Extract about content

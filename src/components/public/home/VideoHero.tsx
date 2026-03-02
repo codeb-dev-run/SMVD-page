@@ -12,11 +12,12 @@ import { gsap } from '@/lib/gsap';
 
 interface VideoHeroProps {
   animateOnMount?: boolean;
+  className?: string;
 }
 
 const MAGNIFICATION = 1.2;
 
-export default function VideoHero({ animateOnMount = true }: VideoHeroProps) {
+export default function VideoHero({ animateOnMount = true, className }: VideoHeroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const hoverVideoRef = useRef<HTMLVideoElement>(null);
   const magnifierRef = useRef<HTMLDivElement>(null);
@@ -85,11 +86,15 @@ export default function VideoHero({ animateOnMount = true }: VideoHeroProps) {
     isActive.current = true;
     containerRef.current?.style.setProperty('cursor', 'none');
 
+    // Kill any ongoing tweens to prevent conflicts
+    if (hoverVideoRef.current) gsap.killTweensOf(hoverVideoRef.current);
+    gsap.killTweensOf(mag);
+
     gsap.set(mag, { left: x, top: y, opacity: 0, display: 'block' });
     gsap.set(inner, { x: -(x * MAGNIFICATION) + half, y: -(y * MAGNIFICATION) + half });
 
-    if (hoverVideoRef.current) gsap.to(hoverVideoRef.current, { opacity: 1, duration: 0.6, ease: 'power2.inOut' });
-    gsap.to(mag, { opacity: 1, duration: 0.3, ease: 'power2.out', delay: 0.1 });
+    if (hoverVideoRef.current) gsap.to(hoverVideoRef.current, { opacity: 1, duration: 0.6, ease: 'power2.inOut', overwrite: 'auto' });
+    gsap.to(mag, { opacity: 1, duration: 0.3, ease: 'power2.out', delay: 0.1, overwrite: 'auto' });
   }, []);
 
   // Deactivate: restore default video
@@ -97,12 +102,17 @@ export default function VideoHero({ animateOnMount = true }: VideoHeroProps) {
     isActive.current = false;
     containerRef.current?.style.setProperty('cursor', 'default');
 
-    if (hoverVideoRef.current) gsap.to(hoverVideoRef.current, { opacity: 0, duration: 0.3, ease: 'power2.inOut' });
+    // Kill any ongoing tweens to prevent conflicts
+    if (hoverVideoRef.current) gsap.killTweensOf(hoverVideoRef.current);
+    if (magnifierRef.current) gsap.killTweensOf(magnifierRef.current);
+
+    if (hoverVideoRef.current) gsap.to(hoverVideoRef.current, { opacity: 0, duration: 0.4, ease: 'power2.inOut', overwrite: 'auto' });
     if (magnifierRef.current) {
       gsap.to(magnifierRef.current, {
-        opacity: 0, duration: 0.3, ease: 'power2.out',
+        opacity: 0, duration: 0.3, ease: 'power2.out', overwrite: 'auto',
         onComplete: () => {
-          if (magnifierRef.current) gsap.set(magnifierRef.current, { display: 'none' });
+          // Guard: only hide if still deactivated (user may have re-entered)
+          if (!isActive.current && magnifierRef.current) gsap.set(magnifierRef.current, { display: 'none' });
         },
       });
     }
@@ -189,7 +199,7 @@ export default function VideoHero({ animateOnMount = true }: VideoHeroProps) {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative w-full h-[40vh] sm:h-[50vh] lg:h-[949px] overflow-hidden mb-6 sm:mb-8 lg:mb-10"
+      className={`relative w-full h-[40vh] sm:h-[50vh] lg:h-[949px] overflow-hidden mb-6 sm:mb-8 lg:mb-10${className ? ` ${className}` : ''}`}
     >
       {/* Default video (circle blob) */}
       <video
@@ -198,8 +208,10 @@ export default function VideoHero({ animateOnMount = true }: VideoHeroProps) {
         muted
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
-        src="/videos/hero-default.mp4"
-      />
+      >
+        <source src="/videos/hero-default.webm" type="video/webm" />
+        <source src="/videos/hero-default.mp4" type="video/mp4" />
+      </video>
 
       {/* Hover video (wave) - fades in when mouse over title */}
       <video
@@ -210,8 +222,10 @@ export default function VideoHero({ animateOnMount = true }: VideoHeroProps) {
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
         style={{ opacity: 0 }}
-        src="/videos/hero-hover.mp4"
-      />
+      >
+        <source src="/videos/hero-hover.webm" type="video/webm" />
+        <source src="/videos/hero-hover.mp4" type="video/mp4" />
+      </video>
 
       {/* Text layer */}
       <div ref={textRef} className="absolute inset-0 pointer-events-none">
@@ -244,8 +258,10 @@ export default function VideoHero({ animateOnMount = true }: VideoHeroProps) {
             muted
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
-            src="/videos/hero-hover.mp4"
-          />
+          >
+            <source src="/videos/hero-hover.webm" type="video/webm" />
+            <source src="/videos/hero-hover.mp4" type="video/mp4" />
+          </video>
           <div className="absolute inset-0 pointer-events-none">
             {typography(false)}
           </div>

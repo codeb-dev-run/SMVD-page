@@ -50,7 +50,7 @@ export function Header({ navigation, headerConfig, animateOnMount = true }: Head
     // Don't animate until loading screen is done
     if (!animateOnMount) return;
 
-    const tween = gsap.to(el, { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out', delay: 0.1 });
+    const tween = gsap.to(el, { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out', delay: 0.1, clearProps: 'transform' });
     return () => { tween.kill(); };
   }, [animateOnMount]);
 

@@ -29,12 +29,14 @@ interface HomePageContentProps {
     year: string;
     src: string;
     alt: string;
+    title?: string;
   }>;
   workItems: Array<{
     src: string;
     alt: string;
     title: string;
     category: string;
+    slug?: string | null;
   }>;
   aboutContent: string;
   navigation?: NavigationItem[];
@@ -60,14 +62,33 @@ export default function HomePageContent({
       {/* Video Hero */}
       <VideoHero />
 
-      {/* Main Content Container - Responsive */}
-      <div className="max-w-[1360px] mx-auto px-5 sm:px-10 lg:px-[55.5px]">
+      {/* Exhibition + About with Circle Video Background (Figma: Glass Circle 1513px) */}
+      <div className="relative overflow-x-clip">
         {/* Exhibition Section */}
-        <ExhibitionSection items={exhibitionItems} />
-      </div>
+        <div className="relative max-w-[1440px] mx-auto px-5 sm:px-10 lg:px-[55.5px]">
+          <ExhibitionSection items={exhibitionItems} />
+        </div>
 
-      {/* About Section (Full Width) */}
-      <AboutSection content={aboutContent} />
+        {/* About Section (Full Width) */}
+        <AboutSection content={aboutContent} />
+
+        {/* Circle Video overlay (Figma: 1513px, mix-blend-mode multiply = white becomes transparent) */}
+        <div
+          className="absolute left-1/2 -translate-x-1/2 top-[60%] sm:top-[30%] w-[90vw] sm:w-screen lg:w-[1513px] aspect-square rounded-full overflow-hidden pointer-events-none"
+          style={{ zIndex: 10, mixBlendMode: 'multiply' }}
+        >
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover opacity-40"
+          >
+            <source src="/videos/hero-default.webm" type="video/webm" />
+            <source src="/videos/hero-default.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
 
       {/* Work Section (Full Width) */}
       <WorkSection items={workItems} />

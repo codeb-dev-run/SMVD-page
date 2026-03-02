@@ -9,6 +9,7 @@ interface ExhibitionItem {
   year: string;
   src: string;
   alt: string;
+  title?: string;
 }
 
 interface ExhibitionSectionProps {
@@ -144,19 +145,21 @@ export default function ExhibitionSection({
     animateTo(targetX, Math.abs(momentum) > 500 ? 0.6 : 0.4);
   }, [getCurrentTranslate, animateTo]);
 
-  // Card hover animation (scale 1.03)
+  // Card hover animation: dark gradient overlay + title text fade-in (Figma spec)
   const handleCardEnter = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (isDragging) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const img = e.currentTarget.querySelector('[data-exhibition-img]');
-    if (!img) return;
-    gsap.to(img, { scale: 1.03, duration: 0.4, ease: 'power2.out' });
+    const overlay = e.currentTarget.querySelector('[data-exhibition-overlay]');
+    const title = e.currentTarget.querySelector('[data-exhibition-title]');
+    if (overlay) gsap.to(overlay, { opacity: 1, duration: 0.4, ease: 'power2.out' });
+    if (title) gsap.to(title, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' });
   }, [isDragging]);
 
   const handleCardLeave = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const img = e.currentTarget.querySelector('[data-exhibition-img]');
-    if (!img) return;
-    gsap.to(img, { scale: 1, duration: 0.3, ease: 'power2.out' });
+    const overlay = e.currentTarget.querySelector('[data-exhibition-overlay]');
+    const title = e.currentTarget.querySelector('[data-exhibition-title]');
+    if (overlay) gsap.to(overlay, { opacity: 0, duration: 0.3, ease: 'power2.out' });
+    if (title) gsap.to(title, { opacity: 0, y: 8, duration: 0.3, ease: 'power2.out' });
   }, []);
 
   // Prevent default drag on images
@@ -242,6 +245,23 @@ export default function ExhibitionSection({
                     draggable={false}
                     quality={80}
                   />
+                  {/* Hover: dark gradient overlay */}
+                  <div
+                    data-exhibition-overlay
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      opacity: 0,
+                      background: 'linear-gradient(180deg, rgba(59, 55, 100, 0.7) 0%, rgba(30, 28, 60, 0.92) 100%)',
+                    }}
+                  />
+                  {/* Hover: exhibition title */}
+                  <p
+                    data-exhibition-title
+                    className="absolute bottom-5 left-5 text-white text-[18px] sm:text-[22px] lg:text-[28px] font-bold m-0 pointer-events-none"
+                    style={{ opacity: 0, transform: 'translateY(8px)', fontFamily: 'var(--font-heading)' }}
+                  >
+                    {item.title || `${item.year} Exhibition`}
+                  </p>
                 </div>
               </div>
           ))}

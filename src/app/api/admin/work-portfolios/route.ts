@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     if (!authResult.authenticated) return authResult.error;
 
     const body = await request.json();
-    const { sectionId, title, category, mediaId } = body;
+    const { sectionId, title, category, mediaId, workProjectId } = body;
 
     // 필수 필드 확인
     if (!sectionId) {
@@ -66,9 +66,10 @@ export async function POST(request: NextRequest) {
         title,
         category,
         mediaId,
+        workProjectId: workProjectId || null,
         order,
       },
-      include: { media: true },
+      include: { media: true, workProject: { select: { slug: true, title: true } } },
     });
 
     return successResponse(item, '작품이 추가되었습니다', 201);
@@ -88,7 +89,7 @@ export async function PUT(request: NextRequest) {
     if (!authResult.authenticated) return authResult.error;
 
     const body = await request.json();
-    const { itemId, title, category, mediaId } = body;
+    const { itemId, title, category, mediaId, workProjectId } = body;
 
     if (!itemId) {
       return errorResponse('아이템 ID가 필요합니다', 'MISSING_ID', 400);
@@ -130,8 +131,9 @@ export async function PUT(request: NextRequest) {
         title,
         category,
         mediaId,
+        ...(workProjectId !== undefined && { workProjectId: workProjectId || null }),
       },
-      include: { media: true },
+      include: { media: true, workProject: { select: { slug: true, title: true } } },
     });
 
     return successResponse(updatedItem, '작품이 업데이트되었습니다');

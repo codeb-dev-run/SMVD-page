@@ -3,7 +3,7 @@ import {
   Footer,
 } from '@/components/public/home';
 import { WorkDetailPage } from '@/components/public/work';
-import { workDetails, WorkDetail } from '@/constants/work-details';
+import { workDetails, WorkDetail, LEGACY_SLUG_MAP } from '@/constants/work-details';
 import type { BlogContent } from '@/components/admin/shared/BlockEditor/types';
 import { prisma } from '@/lib/db';
 import { normalizeContentUrls, normalizeMediaUrl } from '@/lib/media-url';
@@ -18,9 +18,16 @@ export async function generateStaticParams() {
     where: { published: true },
   });
   
-  return projects.map((project) => ({
+  const params = projects.map((project) => ({
     id: project.slug,
   }));
+
+  // Legacy numeric slug paths for backward compatibility
+  Object.keys(LEGACY_SLUG_MAP).forEach((oldSlug) => {
+    params.push({ id: oldSlug });
+  });
+
+  return params;
 }
 
 async function getProjectFromDB(slug: string): Promise<WorkDetail | null> {
@@ -92,10 +99,14 @@ export default async function WorkDetailRoute({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const id = decodeURIComponent(rawId);
+
+  // Resolve legacy numeric slug to new slug
+  const resolvedSlug = LEGACY_SLUG_MAP[id] ?? id;
 
   // Try DB first, then fallback to hardcoded
-  const project = (await getProjectFromDB(id)) ?? workDetails[id];
+  const project = (await getProjectFromDB(resolvedSlug)) ?? workDetails[resolvedSlug];
 
   if (!project) {
     notFound();

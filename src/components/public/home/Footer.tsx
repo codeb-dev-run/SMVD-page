@@ -59,52 +59,38 @@ export function Footer({ data, socialLinks }: FooterProps) {
   return (
     <footer
       ref={footerRef}
-      className="w-full bg-[#ebeef4ff] border-t border-[#e5e7ebff] px-5 sm:px-10 lg:px-[55.5px]"
+      className="w-full bg-[#eaeef4] px-4 sm:px-10 lg:px-10"
     >
       <div
-        className="max-w-[1440px] mx-auto py-8 sm:py-12 lg:py-[81px] flex flex-col sm:flex-row justify-start sm:justify-between gap-6 sm:gap-10"
+        className="max-w-[1440px] mx-auto py-10 sm:py-[60px] lg:py-[60px] flex flex-col justify-center"
       >
-        {/* Left Section - Icon & Info */}
-        <div
-          className="flex flex-col gap-3"
-        >
-          {/* Icon */}
-          <div className="w-6 h-6 sm:w-[31px] sm:h-[32px] block relative">
+        {/* Logo + University Name */}
+        <div className="flex flex-col gap-1">
+          <div className="w-[33px] h-[33px] sm:w-[40px] sm:h-[40px] block relative">
             <img
               src={logoSrc}
               alt="logo"
               className="w-full h-full object-contain"
             />
           </div>
-
-          {/* Text */}
-          <div
-            className="flex flex-col gap-0"
+          <p
+            className="font-sans font-medium text-[#4a4e55] m-0 leading-[1.45] text-[12px] sm:text-[14px] lg:text-[16px]"
           >
-            <p
-              className="font-inter font-bold text-[#434850ff] m-0 leading-[1.6] tracking-[-0.3125px] text-[14px] sm:text-[15px] lg:text-[16px]"
-            >
-              {title}
-            </p>
-            <p
-              className="font-inter font-normal text-[#434850ff] m-0 leading-[1.6] tracking-[-0.3125px] text-[14px] sm:text-[15px] lg:text-[16px]"
-            >
-              {description}
-            </p>
-          </div>
+            {title}
+            <br />
+            {description}
+          </p>
         </div>
 
-        {/* Right Section - Contact */}
-        <div
-          className="flex flex-col gap-2"
-        >
+        {/* Contact Section - 40px gap from above */}
+        <div className="flex flex-col gap-1 mt-10">
           <p
-            className="text-[16px] font-bold text-[#434850ff] font-inter m-0 leading-[1.6] tracking-[-0.3125px]"
+            className="text-[12px] sm:text-[14px] lg:text-[16px] font-bold text-[#4a4e55] font-['Satoshi',sans-serif] m-0 leading-[1.45]"
           >
             Contact
           </p>
           <p
-            className="text-[16px] font-normal text-[#434850ff] font-inter m-0 leading-[1.6] tracking-[-0.3125px]"
+            className="text-[12px] sm:text-[14px] lg:text-[16px] font-medium text-[#4a4e55] font-sans m-0 leading-[1.45]"
           >
             {phone}
             {email && (
@@ -121,41 +107,6 @@ export function Footer({ data, socialLinks }: FooterProps) {
             <br />
             {address}
           </p>
-
-          {/* SNS Links */}
-          {activeSocialLinks.length > 0 && (
-            <div
-              className="flex flex-col gap-2 mt-2"
-            >
-              <p
-                className="text-[16px] font-bold text-[#434850ff] font-inter m-0 leading-[1.6] tracking-[-0.3125px]"
-              >
-                Follow Us
-              </p>
-              <div
-                className="flex flex-row gap-4 flex-wrap"
-              >
-                {activeSocialLinks.map(([platform, link]) => {
-                  const IconComponent = SOCIAL_ICON_MAP[platform];
-                  return (
-                    <a
-                      key={platform}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={platform}
-                      className="flex items-center justify-center text-[#434850ff] transition-colors duration-200 ease-in hover:text-[#1A46E7]"
-                    >
-                      <IconComponent
-                        className="w-6 h-6 sm:w-[31px] sm:h-[32px]"
-                        strokeWidth={1.5}
-                      />
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </footer>

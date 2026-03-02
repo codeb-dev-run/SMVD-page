@@ -15,22 +15,24 @@ export default function AboutSection({
 
   return (
     <section id="about" className="w-full bg-[#ffffffff] flex flex-col">
-      {/* Title Section */}
-      <div className="w-full pt-8 sm:pt-12 lg:pt-[60px] pb-8 sm:pb-12 lg:pb-10 px-5 sm:px-6 lg:px-10">
+      {/* Title Section with underline (matches Exhibition/Work headers) */}
+      <div className="w-full pt-8 sm:pt-12 lg:pt-[60px] px-5 sm:px-6 lg:px-10">
         <div
           style={{
             maxWidth: '1360px',
             margin: '0 auto',
           }}
         >
-          <h2 className="text-[28px] sm:text-[36px] lg:text-[48px] font-bold text-[#000000ff] font-['Helvetica'] m-0">
-            {title}
-          </h2>
+          <div className="pb-5 border-b border-[#141414ff]">
+            <h2 className="text-[20px] sm:text-[24px] lg:text-[32px] font-bold text-[#141414ff] font-['Helvetica'] m-0">
+              {title}
+            </h2>
+          </div>
         </div>
       </div>
 
-      {/* Content Container with Gray Background */}
-      <div ref={sectionRef} className="w-full bg-[#f0f0f0ff] pt-10 sm:pt-[60px] lg:pt-20 pb-10 sm:pb-[60px] lg:pb-20 px-5 sm:px-6 lg:px-10">
+      {/* Content Container */}
+      <div ref={sectionRef} className="w-full bg-white pt-10 sm:pt-[60px] lg:pt-20 pb-10 sm:pb-[60px] lg:pb-20 px-5 sm:px-6 lg:px-10">
         <div className="max-w-[1360px] mx-auto flex items-center justify-center flex-col gap-1 sm:gap-2">
           {content ? (
             // Display content from database
@@ -41,10 +43,10 @@ export default function AboutSection({
             // Display default hardcoded content
             <>
               {/* Line 1: FROM VISUAL DELIVERY + icon */}
-              <div data-about-text className="flex items-center justify-center gap-2 text-[20px] sm:text-[28px] lg:text-[40px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif]">
+              <div data-about-text className="flex items-center justify-center gap-2 text-[18px] sm:text-[34px] lg:text-[48px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif] whitespace-nowrap">
                 FROM VISUAL DELIVERY
                 <svg
-                  className="w-6 h-6 sm:w-7 sm:h-7 lg:w-[36px] lg:h-[36px] shrink-0"
+                  className="w-5 h-5 sm:w-9 sm:h-9 lg:w-[44px] lg:h-[44px] shrink-0"
                   viewBox="0 0 50 50"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -57,9 +59,9 @@ export default function AboutSection({
               </div>
 
               {/* Line 2: icon + TO SYSTEMIC SOLUTIONS */}
-              <div data-about-text className="flex items-center justify-center gap-2 text-[20px] sm:text-[28px] lg:text-[40px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif]">
+              <div data-about-text className="flex items-center justify-center gap-2 text-[18px] sm:text-[34px] lg:text-[48px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif] whitespace-nowrap">
                 <svg
-                  className="w-6 h-6 sm:w-7 sm:h-7 lg:w-[36px] lg:h-[36px] shrink-0"
+                  className="w-5 h-5 sm:w-9 sm:h-9 lg:w-[44px] lg:h-[44px] shrink-0"
                   viewBox="0 0 50 56"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -73,10 +75,10 @@ export default function AboutSection({
               </div>
 
               {/* Line 3: SOLVING + icon + PROBLEMS, */}
-              <div data-about-text className="flex items-center justify-center gap-2 text-[20px] sm:text-[28px] lg:text-[40px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif]">
+              <div data-about-text className="flex items-center justify-center gap-2 text-[18px] sm:text-[34px] lg:text-[48px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif] whitespace-nowrap">
                 SOLVING
                 <svg
-                  className="w-6 h-6 sm:w-7 sm:h-7 lg:w-[36px] lg:h-[36px] shrink-0"
+                  className="w-5 h-5 sm:w-9 sm:h-9 lg:w-[44px] lg:h-[44px] shrink-0"
                   viewBox="0 0 59 62"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -90,7 +92,7 @@ export default function AboutSection({
               </div>
 
               {/* Line 4: SHAPING THE FUTURE OF VISUALS */}
-              <div data-about-text className="text-[20px] sm:text-[28px] lg:text-[40px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif] m-0">
+              <div data-about-text className="text-[18px] sm:text-[34px] lg:text-[48px] font-medium leading-[1.3] text-[#141414ff] font-['Satoshi',sans-serif] whitespace-nowrap m-0">
                 SHAPING THE FUTURE OF VISUALS
               </div>
             </>

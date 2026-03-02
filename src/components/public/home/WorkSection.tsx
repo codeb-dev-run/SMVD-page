@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { gsap } from '@/lib/gsap';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 
@@ -10,6 +11,7 @@ interface WorkItem {
   alt: string;
   title: string;
   category: string;
+  slug?: string | null;
 }
 
 interface WorkSectionProps {
@@ -37,15 +39,18 @@ export default function WorkSection({
   items = workItems,
 }: WorkSectionProps) {
   const [activeCategory, setActiveCategory] = useState('All');
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const gridRef = useScrollReveal({ selector: '[data-work-card]', stagger: 0.1, y: 50 });
 
   const handleCardEnter = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    gsap.to(e.currentTarget, { y: -8, boxShadow: '0 12px 40px rgba(0,0,0,0.1)', duration: 0.3, ease: 'power2.out' });
+    const img = e.currentTarget.querySelector('[data-work-img]') as HTMLElement;
+    if (img) gsap.to(img, { y: -8, boxShadow: '0 12px 40px rgba(0,0,0,0.1)', duration: 0.3, ease: 'power2.out' });
   }, []);
 
   const handleCardLeave = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    gsap.to(e.currentTarget, { y: 0, boxShadow: '0 0px 0px rgba(0,0,0,0)', duration: 0.25, ease: 'power2.out' });
+    const img = e.currentTarget.querySelector('[data-work-img]') as HTMLElement;
+    if (img) gsap.to(img, { y: 0, boxShadow: '0 0px 0px rgba(0,0,0,0)', duration: 0.25, ease: 'power2.out' });
   }, []);
 
   const filteredItems = activeCategory === 'All'
@@ -59,14 +64,18 @@ export default function WorkSection({
 
   const filterButtons = (textClass: string, isVertical: boolean) =>
     categories.map((category) => {
-      const isActive = activeCategory === category;
+      const isSelected = activeCategory === category;
+      const isHovered = hoveredCategory === category;
+      const showActive = isSelected || isHovered;
       return (
         <button
           key={category}
           onClick={() => setActiveCategory(category)}
-          className={`flex items-center gap-[6px] font-normal font-sans tracking-[0.4px] leading-normal whitespace-nowrap border-none cursor-pointer transition-all duration-200 ease-in-out ${isActive ? 'py-1 px-2.5 bg-[#000000ff] text-[#ffffffff] opacity-100' : 'py-1 px-0 bg-transparent text-[#3b3b3bff] opacity-50'} ${textClass}`}
+          onMouseEnter={() => setHoveredCategory(category)}
+          onMouseLeave={() => setHoveredCategory(null)}
+          className={`flex items-center gap-[6px] font-normal font-sans tracking-[0.4px] leading-normal whitespace-nowrap border-none cursor-pointer transition-all duration-200 ease-in-out ${showActive ? 'py-1 px-2.5 bg-[#000000ff] text-[#ffffffff] opacity-100' : 'py-1 px-0 bg-transparent text-[#3b3b3bff] opacity-50'} ${textClass}`}
         >
-          {isActive && (
+          {showActive && (
             <img
               src="/images/check.svg"
               alt="selected"
@@ -116,38 +125,48 @@ export default function WorkSection({
           </div>
 
           {/* Cards: explicit grid placement on desktop, auto-flow on mobile/tablet */}
-          {filteredItems.map((item, idx) => (
-            <div
-              key={item.title}
-              data-work-card
-              onMouseEnter={handleCardEnter}
-              onMouseLeave={handleCardLeave}
-              className="flex flex-col lg:col-(--desk-col) lg:row-(--desk-row) cursor-pointer"
-              style={{
-                '--desk-col': idx % 2 === 0 ? '1' : '3',
-                '--desk-row': `${Math.floor(idx / 2) + 1}`,
-              } as React.CSSProperties}
-            >
-              <div className="relative w-full aspect-4/3 bg-[#e1e1e1ff] overflow-hidden">
-                <Image
-                  src={item.src}
-                  alt={item.alt}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
-                  style={{ objectFit: 'cover' }}
-                  quality={75}
-                />
-              </div>
-              <div className="flex justify-between items-center pt-3">
-                <h3 className="text-[16px] sm:text-[18px] lg:text-[20px] font-medium text-[#000000ff] font-sans m-0 tracking-[-0.449px] leading-normal">
-                  {item.title}
-                </h3>
-                <span className="text-[14px] sm:text-[15px] lg:text-[16px] font-normal text-[#000000ff] font-sans opacity-60 leading-normal shrink-0 ml-3">
-                  {item.category}
-                </span>
-              </div>
-            </div>
-          ))}
+          {filteredItems.map((item, idx) => {
+            const href = item.slug ? `/work/${item.slug}` : '/work';
+            const gridStyle = {
+              '--desk-col': idx % 2 === 0 ? '1' : '3',
+              '--desk-row': `${Math.floor(idx / 2) + 1}`,
+            } as React.CSSProperties;
+
+            return (
+              <Link
+                key={item.title}
+                href={href}
+                className="flex flex-col lg:col-(--desk-col) lg:row-(--desk-row) cursor-pointer no-underline text-inherit"
+                style={gridStyle}
+              >
+                <div
+                  data-work-card
+                  onMouseEnter={handleCardEnter}
+                  onMouseLeave={handleCardLeave}
+                  className="flex flex-col"
+                >
+                  <div data-work-img className="relative w-full aspect-[460/248] bg-[#e1e1e1ff] overflow-hidden">
+                    <Image
+                      src={item.src}
+                      alt={item.alt}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
+                      style={{ objectFit: 'cover' }}
+                      quality={75}
+                    />
+                  </div>
+                  <div className="flex justify-between items-center pt-3">
+                    <h3 className="text-[16px] sm:text-[18px] lg:text-[20px] font-medium text-[#000000ff] font-sans m-0 tracking-[-0.449px] leading-normal">
+                      {item.title}
+                    </h3>
+                    <span className="text-[14px] sm:text-[15px] lg:text-[16px] font-normal text-[#000000ff] font-sans opacity-60 leading-normal shrink-0 ml-3">
+                      {item.category}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>
