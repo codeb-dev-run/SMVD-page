@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useState, useEffect } from 'react';
 import './toolbar.css';
+import './ColumnsExtension';
 
 interface TiptapToolbarProps {
   editor: Editor;
@@ -301,7 +302,7 @@ export default function TiptapToolbar({
       {/* Column Layouts + Vertical Alignment */}
       <div className="toolbar-group">
         <button
-          onClick={() => (editor as any).chain().focus().insertColumns(2).run()}
+          onClick={() => editor.chain().focus().insertColumns(2).run()}
           className="toolbar-button"
           title="2열 레이아웃"
         >
@@ -309,7 +310,7 @@ export default function TiptapToolbar({
         </button>
 
         <button
-          onClick={() => (editor as any).chain().focus().insertColumns(3).run()}
+          onClick={() => editor.chain().focus().insertColumns(3).run()}
           className="toolbar-button"
           title="3열 레이아웃"
         >
@@ -319,7 +320,7 @@ export default function TiptapToolbar({
         <span className="toolbar-separator" />
 
         <button
-          onClick={() => (editor as any).chain().focus().setColumnVerticalAlign('top').run()}
+          onClick={() => editor.chain().focus().setColumnVerticalAlign('top').run()}
           disabled={!editor.isActive('column')}
           className={`toolbar-button ${editor.isActive('column') && (editor.getAttributes('column').verticalAlign || 'top') === 'top' ? 'active' : ''}`}
           title={editor.isActive('column') ? '세로 상단 정렬' : '컬럼 내부를 클릭하세요'}
@@ -328,7 +329,7 @@ export default function TiptapToolbar({
         </button>
 
         <button
-          onClick={() => (editor as any).chain().focus().setColumnVerticalAlign('center').run()}
+          onClick={() => editor.chain().focus().setColumnVerticalAlign('center').run()}
           disabled={!editor.isActive('column')}
           className={`toolbar-button ${editor.isActive('column') && editor.getAttributes('column').verticalAlign === 'center' ? 'active' : ''}`}
           title={editor.isActive('column') ? '세로 가운데 정렬' : '컬럼 내부를 클릭하세요'}
@@ -337,7 +338,7 @@ export default function TiptapToolbar({
         </button>
 
         <button
-          onClick={() => (editor as any).chain().focus().setColumnVerticalAlign('bottom').run()}
+          onClick={() => editor.chain().focus().setColumnVerticalAlign('bottom').run()}
           disabled={!editor.isActive('column')}
           className={`toolbar-button ${editor.isActive('column') && editor.getAttributes('column').verticalAlign === 'bottom' ? 'active' : ''}`}
           title={editor.isActive('column') ? '세로 하단 정렬' : '컬럼 내부를 클릭하세요'}

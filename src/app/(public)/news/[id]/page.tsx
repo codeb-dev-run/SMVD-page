@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import {
   Header,
   Footer,
@@ -12,6 +13,29 @@ import { normalizeContentUrls, normalizeMediaUrl } from '@/lib/media-url';
 
 // ISR: regenerate every 60 seconds. Admin API calls revalidatePath() on mutations.
 export const revalidate = 60;
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ id: string }> },
+): Promise<Metadata> {
+  const { id } = await params;
+
+  const article = await prisma.newsEvent.findUnique({
+    where: { slug: id },
+    select: { title: true, excerpt: true },
+  });
+
+  if (!article) return { title: 'News | SMVD' };
+
+  return {
+    title: `${article.title} | SMVD`,
+    description: article.excerpt || '숙명여자대학교 시각영상디자인과 뉴스',
+    openGraph: {
+      title: `${article.title} | SMVD`,
+      description: article.excerpt || '숙명여자대학교 시각영상디자인과 뉴스',
+      type: 'article',
+    },
+  };
+}
 
 export async function generateStaticParams() {
   const articles = await prisma.newsEvent.findMany({
@@ -190,7 +214,7 @@ export default async function NewsDetailPage({
   const result = await getNewsDetail(id);
 
   return (
-    <div>
+    <article>
       {/* Header */}
       <Header />
 
@@ -217,7 +241,7 @@ export default async function NewsDetailPage({
 
       {/* Footer */}
       <Footer />
-    </div>
+    </article>
   );
 }
 

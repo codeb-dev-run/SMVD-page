@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
@@ -75,14 +76,12 @@ export function Header({ navigation, headerConfig, animateOnMount = true }: Head
         className="w-[36px] h-[36px] sm:w-[42px] sm:h-[42px] mr-auto flex items-center justify-center relative no-underline border-none outline-none"
       >
         {headerConfig?.logoImagePath ? (
-          <img
+          <Image
             src={headerConfig.logoImagePath}
             alt="Logo"
-            style={{
-              maxWidth: '100%',
-              maxHeight: '100%',
-              objectFit: 'contain',
-            }}
+            width={42}
+            height={42}
+            style={{ objectFit: 'contain' }}
           />
         ) : (
           <svg
@@ -115,6 +114,7 @@ export function Header({ navigation, headerConfig, animateOnMount = true }: Head
 
       {/* Desktop Navigation (Hidden on Mobile/Tablet) */}
       <nav
+        aria-label="메인 내비게이션"
         className="hidden lg:flex items-center gap-[18px] h-[38px]"
       >
           {navItems.map((item) => (
@@ -171,6 +171,7 @@ export function Header({ navigation, headerConfig, animateOnMount = true }: Head
 
           {/* Overlay Navigation Links */}
           <nav
+            aria-label="모바일 내비게이션"
             className="flex flex-col p-5 sm:p-10 gap-6"
           >
             {navItems.map((item) => (

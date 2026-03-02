@@ -179,7 +179,7 @@ export default function ExhibitionSection({
           Exhibition
         </h2>
         <div className="flex items-center gap-4">
-          <span className={`text-[12px] font-normal font-['Helvetica'] text-[#999] ${items.length <= 3 ? 'lg:hidden' : ''} ${items.length <= 2 ? 'sm:hidden' : ''} ${items.length <= 1 ? 'hidden' : ''}`}>
+          <span aria-hidden="true" className={`text-[12px] font-normal font-['Helvetica'] text-[#999] ${items.length <= 3 ? 'lg:hidden' : ''} ${items.length <= 2 ? 'sm:hidden' : ''} ${items.length <= 1 ? 'hidden' : ''}`}>
             ← drag →
           </span>
           <a href="#" className="text-[14px] font-normal font-['Helvetica'] text-[#141414ff] no-underline">
@@ -191,6 +191,8 @@ export default function ExhibitionSection({
       {/* Exhibition Items - Horizontal Scrollable Track */}
       <div
         ref={containerRef}
+        role="region"
+        aria-label="전시 갤러리"
         className={`overflow-hidden w-full ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} touch-pan-y`}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}

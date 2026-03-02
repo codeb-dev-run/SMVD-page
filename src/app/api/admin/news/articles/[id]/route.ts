@@ -10,6 +10,7 @@ import {
 import { z } from 'zod';
 import { invalidateNews } from '@/lib/cache';
 import { logger } from '@/lib/logger';
+import { tiptapContentSchema, blockContentSchema } from '@/types/schemas/content-schemas';
 
 // Type guard: efficiently check if an object is empty
 const isEmpty = (obj: unknown): obj is Record<string, never> =>
@@ -35,15 +36,9 @@ const LegacyContentSchema = z.object({
 // Content can be Tiptap JSON, block format, or legacy format
 const ContentSchema = z.union([
   // Tiptap JSON format: { type: "doc", content: [...] }
-  z.object({
-    type: z.literal('doc'),
-    content: z.array(z.any()),
-  }).passthrough(),
+  tiptapContentSchema.passthrough(),
   // Block format: { blocks: [...], version: "1.0" }
-  z.object({
-    blocks: z.array(z.any()),
-    version: z.string(),
-  }).passthrough(),
+  blockContentSchema.extend({ version: z.string() }),
   // Legacy format: { introTitle, introText, gallery }
   LegacyContentSchema,
 ]).optional();

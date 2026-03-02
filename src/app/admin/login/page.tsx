@@ -21,8 +21,8 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [email, setEmail] = useState('admin@smvd.ac.kr');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const callbackUrl = searchParams.get('callbackUrl') || '/admin/dashboard/home';
 
@@ -124,9 +124,6 @@ function LoginForm() {
 
           {/* Footer */}
           <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
-            <p className="text-xs text-gray-500 text-center">
-              기본 계정: admin@smvd.ac.kr / admin123
-            </p>
           </div>
         </div>
 

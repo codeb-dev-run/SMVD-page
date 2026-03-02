@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Instagram, Youtube, Facebook, Twitter, Linkedin } from 'lucide-react';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 
@@ -67,10 +68,12 @@ export function Footer({ data, socialLinks }: FooterProps) {
         {/* Logo + University Name */}
         <div className="flex flex-col gap-1">
           <div className="w-[33px] h-[33px] sm:w-[40px] sm:h-[40px] block relative">
-            <img
+            <Image
               src={logoSrc}
               alt="logo"
-              className="w-full h-full object-contain"
+              width={40}
+              height={40}
+              style={{ objectFit: 'contain' }}
             />
           </div>
           <p
@@ -83,7 +86,7 @@ export function Footer({ data, socialLinks }: FooterProps) {
         </div>
 
         {/* Contact Section - 40px gap from above */}
-        <div className="flex flex-col gap-1 mt-10">
+        <div aria-label="연락처 정보" className="flex flex-col gap-1 mt-10">
           <p
             className="text-[12px] sm:text-[14px] lg:text-[16px] font-bold text-[#4a4e55] font-['Satoshi',sans-serif] m-0 leading-[1.45]"
           >

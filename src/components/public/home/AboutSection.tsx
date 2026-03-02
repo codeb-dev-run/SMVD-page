@@ -32,7 +32,7 @@ export default function AboutSection({
       </div>
 
       {/* Content Container */}
-      <div ref={sectionRef} className="w-full bg-white pt-10 sm:pt-[60px] lg:pt-20 pb-10 sm:pb-[60px] lg:pb-20 px-5 sm:px-6 lg:px-10">
+      <div ref={sectionRef} aria-label="About SMVD 소개" className="w-full bg-white pt-10 sm:pt-[60px] lg:pt-20 pb-10 sm:pb-[60px] lg:pb-20 px-5 sm:px-6 lg:px-10">
         <div className="max-w-[1360px] mx-auto flex items-center justify-center flex-col gap-1 sm:gap-2">
           {content ? (
             // Display content from database

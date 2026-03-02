@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { prisma } from '@/lib/db';
 import {
   Header,
@@ -13,6 +14,15 @@ import {
 
 // ISR: regenerate every 60 seconds for faster reflection of changes.
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: 'About | SMVD',
+  description: '시각영상디자인과 소개',
+  openGraph: {
+    title: 'About | SMVD',
+    description: '시각영상디자인과 소개',
+  },
+};
 
 export default async function AboutPage() {
   // Sections와 People을 병렬로 조회

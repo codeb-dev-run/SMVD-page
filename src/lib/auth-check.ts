@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth/auth";
 import { unauthorizedResponse, errorResponse } from "@/lib/api-response";
 import { NextResponse } from "next/server";
 import { adminRatelimit, getClientIp } from "@/lib/ratelimit";
+import { env } from "@/lib/env";
 
 type AuthSuccessResult = {
   authenticated: true;
@@ -56,7 +57,7 @@ export async function checkAdminAuthFast(
 ): Promise<AuthResult> {
   const token = await getToken({
     req: request as Parameters<typeof getToken>[0]["req"],
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: env.NEXTAUTH_SECRET,
   });
 
   if (!token) {

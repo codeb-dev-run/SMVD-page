@@ -32,6 +32,19 @@ export async function generateMetadata(): Promise<Metadata> {
         icon: faviconPath,
         apple: faviconPath,
       },
+      openGraph: {
+        title: '숙명여자대학교 시각영상디자인과',
+        description: '디지털 시대의 창의적 시각 표현을 주도하는 학과',
+        url: 'https://smvd.sookmyung.ac.kr',
+        siteName: '숙명여자대학교 시각영상디자인과',
+        locale: 'ko_KR',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: '숙명여자대학교 시각영상디자인과',
+        description: '디지털 시대의 창의적 시각 표현을 주도하는 학과',
+      },
     };
   } catch {
     return {
@@ -41,6 +54,19 @@ export async function generateMetadata(): Promise<Metadata> {
       icons: {
         icon: "/favicon.ico",
         apple: "/favicon.ico",
+      },
+      openGraph: {
+        title: '숙명여자대학교 시각영상디자인과',
+        description: '디지털 시대의 창의적 시각 표현을 주도하는 학과',
+        url: 'https://smvd.sookmyung.ac.kr',
+        siteName: '숙명여자대학교 시각영상디자인과',
+        locale: 'ko_KR',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: '숙명여자대학교 시각영상디자인과',
+        description: '디지털 시대의 창의적 시각 표현을 주도하는 학과',
       },
     };
   }

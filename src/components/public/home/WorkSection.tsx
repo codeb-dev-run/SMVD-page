@@ -73,6 +73,7 @@ export default function WorkSection({
           onClick={() => setActiveCategory(category)}
           onMouseEnter={() => setHoveredCategory(category)}
           onMouseLeave={() => setHoveredCategory(null)}
+          aria-pressed={isSelected}
           className={`flex items-center gap-[6px] font-normal font-sans tracking-[0.4px] leading-normal whitespace-nowrap border-none cursor-pointer transition-all duration-200 ease-in-out ${showActive ? 'py-1 px-2.5 bg-[#000000ff] text-[#ffffffff] opacity-100' : 'py-1 px-0 bg-transparent text-[#3b3b3bff] opacity-50'} ${textClass}`}
         >
           {showActive && (
@@ -115,7 +116,7 @@ export default function WorkSection({
         </div>
 
         {/* Grid: 3-col on desktop (col1=cards, col2=filter sticky, col3=cards), 2-col tablet, 1-col mobile */}
-        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr] gap-x-0 sm:gap-x-8 lg:gap-x-[50px] gap-y-6 sm:gap-y-8 lg:gap-y-10">
+        <div ref={gridRef} role="list" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr] gap-x-0 sm:gap-x-8 lg:gap-x-[50px] gap-y-6 sm:gap-y-8 lg:gap-y-10">
           {/* Desktop: center filter in grid col 2, sticky */}
           <div
             className="hidden lg:flex flex-col gap-[2px] col-start-2 sticky top-[100px] self-start pt-1"
@@ -136,6 +137,7 @@ export default function WorkSection({
               <Link
                 key={item.title}
                 href={href}
+                role="listitem"
                 className="flex flex-col lg:col-(--desk-col) lg:row-(--desk-row) cursor-pointer no-underline text-inherit"
                 style={gridStyle}
               >

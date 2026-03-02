@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import {
   Header,
   Footer,
@@ -7,6 +8,15 @@ import { prisma } from '@/lib/db';
 
 // ISR: regenerate every 5 minutes. Admin API calls revalidatePath() on mutations.
 export const revalidate = 300;
+
+export const metadata: Metadata = {
+  title: 'Work | SMVD',
+  description: '시각영상디자인과 작품 아카이브',
+  openGraph: {
+    title: 'Work | SMVD',
+    description: '시각영상디자인과 작품 아카이브',
+  },
+};
 
 // Fetch work data from DB with fallback to hardcoded
 async function getWorkData() {

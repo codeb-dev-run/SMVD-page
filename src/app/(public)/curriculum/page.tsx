@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import {
   Header,
   Footer,
@@ -9,6 +10,15 @@ import type { UndergraduateContent, GraduateContent } from '@/lib/validation/cur
 
 // ISR: regenerate every 10 minutes. Curriculum changes very infrequently.
 export const revalidate = 600;
+
+export const metadata: Metadata = {
+  title: 'Curriculum | SMVD',
+  description: '시각영상디자인과 교육과정',
+  openGraph: {
+    title: 'Curriculum | SMVD',
+    description: '시각영상디자인과 교육과정',
+  },
+};
 
 async function getCurriculumData() {
   try {

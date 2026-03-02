@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { sanitizeContent } from '@/lib/sanitize';
@@ -69,9 +70,12 @@ function HeroImageRenderer({ block }: { block: BlockBase & { url: string; alt: s
         overflow: 'hidden',
       }}
     >
-      <img
+      <Image
         src={block.url}
         alt={block.alt || 'Hero image'}
+        width={1360}
+        height={765}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1360px"
         style={{
           width: '100%',
           height: '100%',

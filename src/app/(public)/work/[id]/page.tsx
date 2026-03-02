@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import {
   Header,
   Footer,
@@ -11,6 +12,32 @@ import { notFound } from 'next/navigation';
 
 // ISR: regenerate every 60 seconds. Admin API calls revalidatePath() on mutations.
 export const revalidate = 60;
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ id: string }> },
+): Promise<Metadata> {
+  const { id: rawId } = await params;
+  const id = decodeURIComponent(rawId);
+  const resolvedSlug = LEGACY_SLUG_MAP[id] ?? id;
+
+  const project = await prisma.workProject.findFirst({
+    where: { OR: [{ slug: resolvedSlug }, { id: resolvedSlug }], published: true },
+    select: { title: true, description: true, thumbnailImage: true },
+  });
+
+  if (!project) return { title: 'Work | SMVD' };
+
+  return {
+    title: `${project.title} | SMVD`,
+    description: project.description || '숙명여자대학교 시각영상디자인과 작품',
+    openGraph: {
+      title: `${project.title} | SMVD`,
+      description: project.description || '숙명여자대학교 시각영상디자인과 작품',
+      images: project.thumbnailImage ? [project.thumbnailImage] : [],
+      type: 'article',
+    },
+  };
+}
 
 export async function generateStaticParams() {
   const projects = await prisma.workProject.findMany({
