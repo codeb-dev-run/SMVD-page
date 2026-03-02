@@ -7,14 +7,24 @@ img/
 # Scripts (dev only)
 scripts/
 
-# Root-level screenshots only (not public/images/)
-/*.png
+# Root-level screenshots and test artifacts
+*.png
+*.mp4
+*.pdf
+*.html
+!public/**
 
 # Documentation (not needed in deployment)
-/*.md
+*.md
 !README.md
 
 # Local dev files
 .env
 .env.example
+.env.production
 prisma/seed.ts
+
+# Build/test artifacts
+report.html
+playwright-report/
+test-results/
