@@ -8,7 +8,18 @@ export const revalidate = 60;
 
 export const metadata = {
   title: '숙명여자대학교 시각영상디자인과',
-  description: '숙명여자대학교 시각영상디자인과 공식 웹사이트',
+  description: '숙명여자대학교 시각영상디자인과 공식 웹사이트. 서울 용산구 위치, 학부·대학원 교육과정, 교수진, 졸업작품, 전시 정보를 제공합니다.',
+  keywords: ['숙명여대', '시각영상디자인과', 'SMVD', '숙명여자대학교', '시각디자인', '영상디자인', '디자인학과'],
+  openGraph: {
+    title: '숙명여자대학교 시각영상디자인과',
+    description: '숙명여자대학교 시각영상디자인과 공식 웹사이트. 서울 용산구 위치, 학부·대학원 교육과정, 교수진, 졸업작품, 전시 정보를 제공합니다.',
+    url: 'https://smvd.sookmyung.ac.kr',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '숙명여자대학교 시각영상디자인과',
+    description: '숙명여자대학교 시각영상디자인과 공식 웹사이트.',
+  },
 };
 
 export default async function HomePage() {

@@ -12,11 +12,18 @@ import type { UndergraduateContent, GraduateContent } from '@/lib/validation/cur
 export const revalidate = 600;
 
 export const metadata: Metadata = {
-  title: 'Curriculum | SMVD',
-  description: '시각영상디자인과 교육과정',
+  title: 'Curriculum',
+  description: '숙명여자대학교 시각영상디자인과 교육과정. 학부 및 대학원 커리큘럼, 전공 과목, 이수 체계를 안내합니다.',
+  keywords: ['시각영상디자인 교육과정', '커리큘럼', '전공과목', '숙명여대 디자인학과', '학부', '대학원'],
   openGraph: {
-    title: 'Curriculum | SMVD',
-    description: '시각영상디자인과 교육과정',
+    title: 'Curriculum | 숙명여자대학교 시각영상디자인과',
+    description: '숙명여자대학교 시각영상디자인과 교육과정. 학부 및 대학원 커리큘럼, 전공 과목, 이수 체계를 안내합니다.',
+    url: 'https://smvd.sookmyung.ac.kr/curriculum',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Curriculum | 숙명여자대학교 시각영상디자인과',
+    description: '숙명여자대학교 시각영상디자인과 학부·대학원 교육과정 안내.',
   },
 };
 

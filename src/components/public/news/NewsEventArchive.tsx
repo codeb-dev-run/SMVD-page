@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 interface NewsItem {
@@ -96,56 +95,18 @@ const defaultNewsItems: NewsItem[] = [
   },
 ];
 
-const categories = ['ALL', 'Notice', 'Event', 'Lecture', 'Exhibition', 'Awards', 'Recruiting'];
-
 interface NewsEventArchiveProps {
   items?: NewsItem[] | null;
 }
 
 export default function NewsEventArchive({ items }: NewsEventArchiveProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
-
   const newsItems = items ?? defaultNewsItems;
-
-  // Filter items based on selected category
-  const displayedItems =
-    selectedCategory === 'ALL'
-      ? newsItems
-      : newsItems.filter((item) => item.category === selectedCategory);
-
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
-  };
 
   return (
     <div className="flex flex-col gap-4 w-full px-4 sm:px-6 lg:px-10">
-      {/* Title */}
-      <div className="w-full pb-4 sm:pb-5 border-b-2 border-neutral-1450">
-        <h1 className="text-[18px] sm:text-[20px] lg:text-[24px] font-bold font-satoshi text-[#1b1d1f] m-0 py-2">
-          News&Event
-        </h1>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="flex gap-2 sm:gap-3 overflow-x-auto sm:flex-wrap sm:overflow-x-visible pb-1 sm:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => handleCategoryChange(category)}
-            className={`shrink-0 font-satoshi transition-all duration-300 pb-1 whitespace-nowrap bg-transparent cursor-pointer border-none text-[12px] sm:text-[14px] lg:text-[16px] ${
-              selectedCategory === category
-                ? 'font-semibold text-neutral-1450'
-                : 'font-normal text-[#7b828e]'
-            }`}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
-
       {/* Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 lg:gap-10 w-full">
-        {displayedItems.map((item) => (
+        {newsItems.map((item) => (
           <Link key={item.id} href={`/news/${item.id}`} prefetch={true}>
             <div
               className="flex gap-5 pb-5 border-b border-[#d6d8dc] cursor-pointer transition-transform duration-300 hover:-translate-y-1"

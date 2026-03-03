@@ -10,11 +10,18 @@ import { prisma } from '@/lib/db';
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: 'News & Event | SMVD',
-  description: '시각영상디자인과 소식 및 행사',
+  title: 'News & Event',
+  description: '숙명여자대학교 시각영상디자인과 최신 소식과 행사 안내. 공지사항, 이벤트, 강연, 전시, 수상 소식을 확인하세요.',
+  keywords: ['시각영상디자인 소식', '공지사항', '이벤트', '전시', '강연', '수상', '숙명여대 뉴스', 'SMVD news'],
   openGraph: {
-    title: 'News & Event | SMVD',
-    description: '시각영상디자인과 소식 및 행사',
+    title: 'News & Event | 숙명여자대학교 시각영상디자인과',
+    description: '숙명여자대학교 시각영상디자인과 최신 소식과 행사 안내. 공지사항, 이벤트, 강연, 전시, 수상 소식을 확인하세요.',
+    url: 'https://smvd.sookmyung.ac.kr/news',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'News & Event | 숙명여자대학교 시각영상디자인과',
+    description: '숙명여자대학교 시각영상디자인과 최신 소식과 행사 안내.',
   },
 };
 

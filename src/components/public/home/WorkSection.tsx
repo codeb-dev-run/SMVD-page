@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { gsap } from '@/lib/gsap';
+import { gsap, ScrollTrigger } from '@/lib/gsap';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 interface WorkItem {
@@ -40,7 +40,97 @@ export default function WorkSection({
 }: WorkSectionProps) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  const [cardsOpacity, setCardsOpacity] = useState(1);
+  const [showAllFilters, setShowAllFilters] = useState(true);
   const gridRef = useScrollReveal({ selector: '[data-work-card]', stagger: 0.1, y: 50 });
+  const [showFloatingLabel, setShowFloatingLabel] = useState(false);
+  const hasAutoCycled = useRef(false);
+  const isCycling = useRef(false);
+  const sectionTriggerRef = useRef<HTMLElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const cycleTimeouts = useRef<number[]>([]);
+
+  // Floating label: show when header scrolls out, hide when section leaves
+  useEffect(() => {
+    const header = headerRef.current;
+    const section = sectionTriggerRef.current;
+    if (!header || !section) return;
+
+    let headerVisible = true;
+    let sectionVisible = true;
+
+    const update = () => setShowFloatingLabel(!headerVisible && sectionVisible);
+
+    const headerObs = new IntersectionObserver(
+      ([e]) => { headerVisible = e.isIntersecting; update(); },
+      { threshold: 0 },
+    );
+    const sectionObs = new IntersectionObserver(
+      ([e]) => { sectionVisible = e.isIntersecting; update(); },
+      { threshold: 0 },
+    );
+
+    headerObs.observe(header);
+    sectionObs.observe(section);
+    return () => { headerObs.disconnect(); sectionObs.disconnect(); };
+  }, []);
+
+  // Fade-out → swap category → fade-in
+  const fadeTo = useCallback((cat: string, onDone?: () => void) => {
+    setCardsOpacity(0);
+    const id = window.setTimeout(() => {
+      setActiveCategory(cat);
+      // Wait for React to render new cards at opacity 0, then fade in
+      setTimeout(() => setCardsOpacity(1), 30);
+      onDone?.();
+    }, 300);
+    cycleTimeouts.current.push(id);
+  }, []);
+
+  // Auto-cycle with fade on scroll enter
+  useEffect(() => {
+    const el = sectionTriggerRef.current;
+    if (!el || hasAutoCycled.current) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const cycleOrder = ['UX/UI', 'Motion', 'Branding', 'Game design', 'Graphic', 'All'];
+
+    const cycleTo = (idx: number) => {
+      if (idx >= cycleOrder.length) {
+        isCycling.current = false;
+        // Cycle done → reveal all filter buttons with stagger
+        setShowAllFilters(true);
+        return;
+      }
+      fadeTo(cycleOrder[idx], () => {
+        if (idx + 1 < cycleOrder.length) {
+          const nextId = window.setTimeout(() => cycleTo(idx + 1), 700);
+          cycleTimeouts.current.push(nextId);
+        } else {
+          isCycling.current = false;
+          setShowAllFilters(true);
+        }
+      });
+    };
+
+    const trigger = ScrollTrigger.create({
+      trigger: el,
+      start: 'top 75%',
+      once: true,
+      onEnter: () => {
+        if (hasAutoCycled.current) return;
+        hasAutoCycled.current = true;
+        isCycling.current = true;
+        setShowAllFilters(false); // Hide non-active filters during cycling
+        cycleTo(0);
+      },
+    });
+
+    return () => {
+      trigger.kill();
+      cycleTimeouts.current.forEach(id => clearTimeout(id));
+    };
+  }, [fadeTo]);
 
   const handleCardEnter = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -62,29 +152,46 @@ export default function WorkSection({
 
   const totalRows = Math.ceil(filteredItems.length / 2);
 
+  const handleCategoryClick = useCallback((cat: string) => {
+    if (cat === activeCategory || isCycling.current) return;
+    fadeTo(cat);
+  }, [activeCategory, fadeTo]);
+
   const filterButtons = (textClass: string, isVertical: boolean) =>
-    categories.map((category) => {
+    categories.map((category, idx) => {
       const isSelected = activeCategory === category;
       const isHovered = hoveredCategory === category;
       const showActive = isSelected || isHovered;
+      const isVisible = showAllFilters || isSelected;
+
       return (
         <button
           key={category}
-          onClick={() => setActiveCategory(category)}
+          onClick={() => handleCategoryClick(category)}
           onMouseEnter={() => setHoveredCategory(category)}
           onMouseLeave={() => setHoveredCategory(null)}
           aria-pressed={isSelected}
-          className={`flex items-center gap-[6px] font-normal font-sans tracking-[0.4px] leading-normal whitespace-nowrap border-none cursor-pointer transition-all duration-200 ease-in-out ${showActive ? 'py-1 px-2.5 bg-[#000000ff] text-[#ffffffff] opacity-100' : 'py-1 px-0 bg-transparent text-[#3b3b3bff] opacity-50'} ${textClass}`}
+          className={`flex items-center gap-[6px] font-normal font-sans tracking-[0.4px] leading-normal whitespace-nowrap border-none cursor-pointer transition-all duration-300 ease-in-out overflow-hidden ${showActive ? 'py-1 px-2.5 bg-[#000000ff] text-[#ffffffff]' : 'py-1 px-0 bg-transparent text-[#3b3b3bff]'} ${textClass}`}
+          style={{
+            opacity: isVisible ? (showActive ? 1 : 0.5) : 0,
+            ...(isVertical
+              ? { maxHeight: isVisible ? '60px' : 0, paddingTop: isVisible ? undefined : 0, paddingBottom: isVisible ? undefined : 0 }
+              : { maxWidth: isVisible ? '200px' : 0, paddingLeft: isVisible ? undefined : 0, paddingRight: isVisible ? undefined : 0 }),
+            transitionDelay: showAllFilters && !isSelected ? `${idx * 60}ms` : '0ms',
+          }}
         >
-          {showActive && (
-            <img
-              src="/images/check.svg"
-              alt="selected"
-              width={isVertical ? 14 : 10}
-              height={isVertical ? 16 : 12}
-              className="shrink-0"
-            />
-          )}
+          <img
+            src="/images/check.svg"
+            alt="selected"
+            width={isVertical ? 14 : 10}
+            height={isVertical ? 16 : 12}
+            className="shrink-0 transition-all duration-300 ease-in-out"
+            style={{
+              opacity: showActive ? 1 : 0,
+              width: showActive ? (isVertical ? 14 : 10) : 0,
+              marginRight: showActive ? 0 : -6,
+            }}
+          />
           {category}
         </button>
       );
@@ -92,11 +199,20 @@ export default function WorkSection({
 
   return (
     <section
+      ref={sectionTriggerRef}
       id="work"
-      className="w-full bg-[#ffffffff] border-t border-[#adadadff] pt-8 sm:pt-12 lg:pt-[61px] pb-8 sm:pb-12 lg:pb-[61px] px-4 sm:px-6 lg:px-10"
+      className="w-full bg-[#ffffffff] pt-8 sm:pt-12 lg:pt-[61px] pb-8 sm:pb-12 lg:pb-[61px] px-4 sm:px-6 lg:px-10"
     >
+      {/* Floating section label */}
+      <div
+        className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-2 bg-black/80 text-white text-[13px] font-medium rounded-full backdrop-blur-sm pointer-events-none transition-all duration-300"
+        style={{ opacity: showFloatingLabel ? 1 : 0, transform: `translateX(-50%) translateY(${showFloatingLabel ? 0 : -12}px)` }}
+      >
+        Work
+      </div>
+
       {/* Header */}
-      <div className="w-full max-w-[1440px] mx-auto mb-8 sm:mb-12 flex items-center justify-between border-b border-[#adadadff] flex-col sm:flex-row gap-3 sm:gap-0">
+      <div ref={headerRef} className="w-full max-w-[1440px] mx-auto mb-8 sm:mb-12 flex items-center justify-between border-b border-[#adadadff] flex-col sm:flex-row gap-3 sm:gap-0">
         <h2 className="text-[28px] sm:text-[40px] lg:text-[48px] font-medium text-[#000000ff] font-sans m-0 tracking-[-0.128px] leading-normal pb-3 sm:pb-0 w-full sm:w-auto">
           {title}
         </h2>
@@ -139,7 +255,7 @@ export default function WorkSection({
                 href={href}
                 role="listitem"
                 className="flex flex-col lg:col-(--desk-col) lg:row-(--desk-row) cursor-pointer no-underline text-inherit"
-                style={gridStyle}
+                style={{ ...gridStyle, opacity: cardsOpacity, transition: 'opacity 0.3s ease-in-out' }}
               >
                 <div
                   data-work-card

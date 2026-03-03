@@ -27,17 +27,38 @@ interface HeaderProps {
   animateOnMount?: boolean;
 }
 
+interface NavItemConfig {
+  label: string;
+  href: string;
+  children?: { label: string; href: string }[];
+}
+
 // 기본 메뉴 (CMS 연동 없을 때)
-const DEFAULT_NAV_ITEMS = [
-  { label: 'About', href: '/about' },
+const DEFAULT_NAV_ITEMS: NavItemConfig[] = [
+  {
+    label: 'About',
+    href: '/about',
+    children: [
+      { label: 'About Major', href: '/about' },
+      { label: 'Our People', href: '/about?tab=people' },
+    ],
+  },
   { label: 'Curriculum', href: '/curriculum' },
-  { label: 'Work', href: '/work' },
+  {
+    label: 'Work',
+    href: '/work',
+    children: [
+      { label: 'Achieve', href: '/work' },
+      { label: 'Exhibition', href: '/work?tab=exhibition' },
+    ],
+  },
   { label: 'News&Event', href: '/news' },
 ];
 
 export function Header({ navigation, headerConfig, animateOnMount = true }: HeaderProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -61,7 +82,7 @@ export function Header({ navigation, headerConfig, animateOnMount = true }: Head
   };
 
   // CMS에서 네비게이션을 받으면 그것 사용, 아니면 기본값 사용
-  const navItems = navigation && navigation.length > 0
+  const navItems: NavItemConfig[] = navigation && navigation.length > 0
     ? navigation.map(item => ({ label: item.label, href: item.href }))
     : DEFAULT_NAV_ITEMS;
 
@@ -118,27 +139,56 @@ export function Header({ navigation, headerConfig, animateOnMount = true }: Head
         className="hidden lg:flex items-center gap-[18px] h-[38px]"
       >
           {navItems.map((item) => (
-            <Link
+            <div
               key={item.href}
-              href={item.href}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '38px',
-                padding: '0 16px',
-                fontSize: '14px',
-                fontWeight: '500',
-                fontFamily: 'Helvetica',
-                textDecoration: 'none',
-                border: '1px solid #141414ff',
-                backgroundColor: isActive(item.href) ? '#141414ff' : '#ffffffff',
-                color: isActive(item.href) ? '#ffffffff' : '#141414ff',
-                borderRadius: '0px',
-              }}
+              className="relative"
+              onMouseEnter={() => item.children && setOpenDropdown(item.label)}
+              onMouseLeave={() => setOpenDropdown(null)}
             >
-              {item.label}
-            </Link>
+              <Link
+                href={item.href}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px',
+                  height: '38px',
+                  padding: '0 16px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  fontFamily: 'Helvetica',
+                  textDecoration: 'none',
+                  border: '1px solid #141414ff',
+                  backgroundColor: isActive(item.href) ? '#141414ff' : '#ffffffff',
+                  color: isActive(item.href) ? '#ffffffff' : '#141414ff',
+                  borderRadius: '0px',
+                }}
+              >
+                {item.label}
+                {item.children && (
+                  <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </Link>
+              {item.children && openDropdown === item.label && (
+                <div
+                  className="absolute top-full left-0 mt-0 min-w-[160px] bg-white border border-[#141414] z-50"
+                  style={{ fontFamily: 'Helvetica' }}
+                >
+                  {item.children.map((child) => (
+                    <Link
+                      key={child.href}
+                      href={child.href}
+                      className="block px-4 py-2.5 text-[13px] text-[#141414] hover:bg-[#141414] hover:text-white transition-colors no-underline"
+                      onClick={() => setOpenDropdown(null)}
+                    >
+                      {child.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </nav>
 

@@ -92,13 +92,9 @@ export default function WorkProjectModal({
     setError(null);
 
     if (!title.trim()) { setError('제목을 입력하세요'); return; }
-    if (!subtitle.trim()) { setError('부제를 입력하세요'); return; }
     if (!category) { setError('카테고리를 선택하세요'); return; }
-    if (!author.trim()) { setError('작가명을 입력하세요'); return; }
-    if (!email.trim()) { setError('이메일을 입력하세요'); return; }
 
     if (!isEditing) {
-      if (!heroImage.trim()) { setError('히어로 이미지 경로를 입력하세요'); return; }
       if (!thumbnailImage.trim()) { setError('썸네일 이미지 경로를 입력하세요'); return; }
     }
 
@@ -192,165 +188,173 @@ export default function WorkProjectModal({
             </div>
           </div>
 
-          {/* Subtitle */}
+          {/* Thumbnail */}
           <div>
-            <label htmlFor="project-subtitle" className="block text-sm font-medium text-gray-700 mb-1">
-              부제 *
+            <label htmlFor="project-thumbnail" className="block text-sm font-medium text-gray-700 mb-1">
+              썸네일 이미지 경로 {!isEditing && '*'}
             </label>
             <input
-              id="project-subtitle"
+              id="project-thumbnail"
               type="text"
-              value={subtitle}
-              onChange={(e) => setSubtitle(e.target.value)}
-              placeholder="권나연 외 3명, 2025"
+              value={thumbnailImage}
+              onChange={(e) => setThumbnailImage(e.target.value)}
+              placeholder="/images/work/portfolio-12.png"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
             />
+            {thumbnailImage && (
+              <div className="mt-2 w-24 h-18 bg-gray-100 rounded overflow-hidden">
+                <img src={thumbnailImage} alt="Thumbnail preview" className="w-full h-full object-cover" />
+              </div>
+            )}
           </div>
 
-          {/* Row: Author + Email + Year */}
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label htmlFor="project-author" className="block text-sm font-medium text-gray-700 mb-1">
-                작가명 *
-              </label>
-              <input
-                id="project-author"
-                type="text"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                placeholder="권나연"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              />
-            </div>
-            <div>
-              <label htmlFor="project-email" className="block text-sm font-medium text-gray-700 mb-1">
-                이메일 *
-              </label>
-              <input
-                id="project-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="contact@example.com"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              />
-            </div>
-            <div>
-              <label htmlFor="project-year" className="block text-sm font-medium text-gray-700 mb-1">
-                연도
-              </label>
-              <input
-                id="project-year"
-                type="text"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                placeholder="2025"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              />
-            </div>
-          </div>
+          {/* Optional fields */}
+          <details className="border border-gray-200 rounded-lg">
+            <summary className="px-4 py-3 text-sm font-medium text-gray-700 cursor-pointer select-none hover:bg-gray-50 rounded-lg">
+              추가 정보 (선택사항)
+            </summary>
+            <div className="px-4 pb-4 pt-3 space-y-5">
+              {/* Subtitle */}
+              <div>
+                <label htmlFor="project-subtitle" className="block text-sm font-medium text-gray-700 mb-1">
+                  부제
+                </label>
+                <input
+                  id="project-subtitle"
+                  type="text"
+                  value={subtitle}
+                  onChange={(e) => setSubtitle(e.target.value)}
+                  placeholder="권나연 외 3명, 2025"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                />
+              </div>
 
-          {/* Tags */}
-          <div>
-            <label htmlFor="project-tags" className="block text-sm font-medium text-gray-700 mb-1">
-              태그 (쉼표 구분)
-            </label>
-            <input
-              id="project-tags"
-              type="text"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              placeholder="UX/UI, Branding, Motion"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label htmlFor="project-description" className="block text-sm font-medium text-gray-700 mb-1">
-              설명
-            </label>
-            <textarea
-              id="project-description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="프로젝트 설명..."
-              rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-y"
-            />
-          </div>
-
-          {/* Row: Hero Image + Thumbnail */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="project-hero" className="block text-sm font-medium text-gray-700 mb-1">
-                히어로 이미지 경로 {!isEditing && '*'}
-              </label>
-              <input
-                id="project-hero"
-                type="text"
-                value={heroImage}
-                onChange={(e) => setHeroImage(e.target.value)}
-                placeholder="/images/work/vora/hero.png"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              />
-              {heroImage && (
-                <div className="mt-2 w-full h-24 bg-gray-100 rounded overflow-hidden">
-                  <img src={heroImage} alt="Hero preview" className="w-full h-full object-cover" />
+              {/* Row: Author + Email + Year */}
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label htmlFor="project-author" className="block text-sm font-medium text-gray-700 mb-1">
+                    작가명
+                  </label>
+                  <input
+                    id="project-author"
+                    type="text"
+                    value={author}
+                    onChange={(e) => setAuthor(e.target.value)}
+                    placeholder="권나연"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  />
                 </div>
-              )}
-            </div>
-            <div>
-              <label htmlFor="project-thumbnail" className="block text-sm font-medium text-gray-700 mb-1">
-                썸네일 이미지 경로 {!isEditing && '*'}
-              </label>
-              <input
-                id="project-thumbnail"
-                type="text"
-                value={thumbnailImage}
-                onChange={(e) => setThumbnailImage(e.target.value)}
-                placeholder="/images/work/portfolio-12.png"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              />
-              {thumbnailImage && (
-                <div className="mt-2 w-24 h-18 bg-gray-100 rounded overflow-hidden">
-                  <img src={thumbnailImage} alt="Thumbnail preview" className="w-full h-full object-cover" />
+                <div>
+                  <label htmlFor="project-email" className="block text-sm font-medium text-gray-700 mb-1">
+                    이메일
+                  </label>
+                  <input
+                    id="project-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="contact@example.com"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  />
                 </div>
-              )}
+                <div>
+                  <label htmlFor="project-year" className="block text-sm font-medium text-gray-700 mb-1">
+                    연도
+                  </label>
+                  <input
+                    id="project-year"
+                    type="text"
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                    placeholder="2025"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  />
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div>
+                <label htmlFor="project-tags" className="block text-sm font-medium text-gray-700 mb-1">
+                  태그 (쉼표 구분)
+                </label>
+                <input
+                  id="project-tags"
+                  type="text"
+                  value={tags}
+                  onChange={(e) => setTags(e.target.value)}
+                  placeholder="UX/UI, Branding, Motion"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label htmlFor="project-description" className="block text-sm font-medium text-gray-700 mb-1">
+                  설명
+                </label>
+                <textarea
+                  id="project-description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="프로젝트 설명..."
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-y"
+                />
+              </div>
+
+              {/* Hero Image */}
+              <div>
+                <label htmlFor="project-hero" className="block text-sm font-medium text-gray-700 mb-1">
+                  히어로 이미지 경로
+                </label>
+                <input
+                  id="project-hero"
+                  type="text"
+                  value={heroImage}
+                  onChange={(e) => setHeroImage(e.target.value)}
+                  placeholder="/images/work/vora/hero.png"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                />
+                {heroImage && (
+                  <div className="mt-2 w-full h-24 bg-gray-100 rounded overflow-hidden">
+                    <img src={heroImage} alt="Hero preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
+              </div>
+
+              {/* Gallery Images */}
+              <div>
+                <label htmlFor="project-gallery" className="block text-sm font-medium text-gray-700 mb-1">
+                  갤러리 이미지 (줄바꿈으로 구분)
+                </label>
+                <textarea
+                  id="project-gallery"
+                  value={galleryImagesStr}
+                  onChange={(e) => setGalleryImagesStr(e.target.value)}
+                  placeholder={"/images/work/vora/gallery-1.png\n/images/work/vora/gallery-2.png\n/images/work/vora/gallery-3.png"}
+                  rows={4}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-y font-mono text-sm"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  한 줄에 하나의 이미지 경로를 입력하세요
+                </p>
+              </div>
+
+              {/* Published */}
+              <div className="flex items-center gap-2">
+                <input
+                  id="project-published"
+                  type="checkbox"
+                  checked={published}
+                  onChange={(e) => setPublished(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="project-published" className="text-sm font-medium text-gray-700">
+                  공개
+                </label>
+              </div>
             </div>
-          </div>
-
-          {/* Gallery Images */}
-          <div>
-            <label htmlFor="project-gallery" className="block text-sm font-medium text-gray-700 mb-1">
-              갤러리 이미지 (줄바꿈으로 구분)
-            </label>
-            <textarea
-              id="project-gallery"
-              value={galleryImagesStr}
-              onChange={(e) => setGalleryImagesStr(e.target.value)}
-              placeholder={"/images/work/vora/gallery-1.png\n/images/work/vora/gallery-2.png\n/images/work/vora/gallery-3.png"}
-              rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-y font-mono text-sm"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              한 줄에 하나의 이미지 경로를 입력하세요
-            </p>
-          </div>
-
-          {/* Published */}
-          <div className="flex items-center gap-2">
-            <input
-              id="project-published"
-              type="checkbox"
-              checked={published}
-              onChange={(e) => setPublished(e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="project-published" className="text-sm font-medium text-gray-700">
-              공개
-            </label>
-          </div>
+          </details>
 
           {/* Error */}
           {error && (

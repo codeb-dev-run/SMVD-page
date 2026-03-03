@@ -16,11 +16,18 @@ import {
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'About | SMVD',
-  description: '시각영상디자인과 소개',
+  title: 'About',
+  description: '숙명여자대학교 시각영상디자인과 소개. 학과 비전, 역사, 교육 철학과 교수진 정보를 확인하세요.',
+  keywords: ['시각영상디자인과 소개', '학과 비전', '교수진', '숙명여대 디자인', 'SMVD about'],
   openGraph: {
-    title: 'About | SMVD',
-    description: '시각영상디자인과 소개',
+    title: 'About | 숙명여자대학교 시각영상디자인과',
+    description: '숙명여자대학교 시각영상디자인과 소개. 학과 비전, 역사, 교육 철학과 교수진 정보를 확인하세요.',
+    url: 'https://smvd.sookmyung.ac.kr/about',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About | 숙명여자대학교 시각영상디자인과',
+    description: '숙명여자대학교 시각영상디자인과 소개. 학과 비전, 역사, 교수진 정보.',
   },
 };
 

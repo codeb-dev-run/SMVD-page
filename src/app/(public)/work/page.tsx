@@ -10,11 +10,18 @@ import { prisma } from '@/lib/db';
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: 'Work | SMVD',
-  description: '시각영상디자인과 작품 아카이브',
+  title: 'Work',
+  description: '숙명여자대학교 시각영상디자인과 졸업작품 및 전시 아카이브. 학생들의 창의적인 시각·영상 디자인 작품을 소개합니다.',
+  keywords: ['졸업작품', '디자인 작품', '전시', '시각디자인 포트폴리오', '숙명여대 작품', 'SMVD work', '아카이브'],
   openGraph: {
-    title: 'Work | SMVD',
-    description: '시각영상디자인과 작품 아카이브',
+    title: 'Work | 숙명여자대학교 시각영상디자인과',
+    description: '숙명여자대학교 시각영상디자인과 졸업작품 및 전시 아카이브. 학생들의 창의적인 시각·영상 디자인 작품을 소개합니다.',
+    url: 'https://smvd.sookmyung.ac.kr/work',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Work | 숙명여자대학교 시각영상디자인과',
+    description: '숙명여자대학교 시각영상디자인과 졸업작품 및 전시 아카이브.',
   },
 };
 

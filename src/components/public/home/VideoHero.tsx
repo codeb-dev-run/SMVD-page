@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useLayoutEffect, useCallback } from 'react';
+import { useRef, useEffect, useLayoutEffect, useCallback, useState } from 'react';
 import { gsap } from '@/lib/gsap';
 
 /**
@@ -18,6 +18,8 @@ interface VideoHeroProps {
 const MAGNIFICATION = 1.2;
 
 export default function VideoHero({ animateOnMount = true, className }: VideoHeroProps) {
+  const [glassMode, setGlassMode] = useState<'A' | 'B'>('A');
+  const [barrelMapUrl, setBarrelMapUrl] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const hoverVideoRef = useRef<HTMLVideoElement>(null);
   const magnifierRef = useRef<HTMLDivElement>(null);
@@ -25,6 +27,39 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
   const textRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const isActive = useRef(false);
+
+  // Generate barrel distortion displacement map (convex lens)
+  useEffect(() => {
+    const size = 256;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const imgData = ctx.createImageData(size, size);
+    const d = imgData.data;
+    const c = size / 2;
+
+    for (let py = 0; py < size; py++) {
+      for (let px = 0; px < size; px++) {
+        const nx = (px - c) / c; // -1 ~ 1
+        const ny = (py - c) / c;
+        const r2 = nx * nx + ny * ny;
+
+        // Barrel distortion: displacement ∝ r² (quadratic), direction = outward from center
+        const k = 70;
+        const i = (py * size + px) * 4;
+        d[i]     = Math.min(255, Math.max(0, Math.round(128 + nx * r2 * k))); // R → X displacement
+        d[i + 1] = Math.min(255, Math.max(0, Math.round(128 + ny * r2 * k))); // G → Y displacement
+        d[i + 2] = 128;
+        d[i + 3] = 255;
+      }
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+    setBarrelMapUrl(canvas.toDataURL());
+  }, []);
 
   // Force-reset on mount/HMR
   useLayoutEffect(() => {
@@ -199,8 +234,20 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`relative w-full h-[40vh] sm:h-[50vh] lg:h-[949px] overflow-hidden mb-6 sm:mb-8 lg:mb-10${className ? ` ${className}` : ''}`}
+      className={`relative w-full h-[40vh] sm:h-[50vh] lg:h-[949px] overflow-hidden mb-10${className ? ` ${className}` : ''}`}
     >
+      {/* SVG filter for Mockup A: barrel distortion via displacement map */}
+      {barrelMapUrl && (
+        <svg width="0" height="0" className="absolute">
+          <defs>
+            <filter id="convex-lens" x="-10%" y="-10%" width="120%" height="120%">
+              <feImage href={barrelMapUrl} result="dispMap" width="100%" height="100%" preserveAspectRatio="none" />
+              <feDisplacementMap in="SourceGraphic" in2="dispMap" scale="45" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+          </defs>
+        </svg>
+      )}
+
       {/* Default video (circle blob) */}
       <video
         autoPlay
@@ -229,19 +276,24 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
 
       {/* Text layer */}
       <div ref={textRef} className="absolute inset-0 pointer-events-none">
-        {typography(true)}
+        <div className="max-w-[1440px] mx-auto relative w-full h-full">
+          {typography(true)}
+        </div>
       </div>
 
       {/* Magnifier — display:none by default */}
       <div
         ref={magnifierRef}
-        className="absolute pointer-events-none rounded-full overflow-hidden w-[200px] h-[200px] sm:w-[280px] sm:h-[280px] lg:w-[400px] lg:h-[400px]"
+        className="absolute pointer-events-none rounded-full overflow-hidden w-[120px] h-[120px] sm:w-[160px] sm:h-[160px] lg:w-[200px] lg:h-[200px]"
         style={{
           display: 'none',
           opacity: 0,
           transform: 'translate(-50%, -50%)',
-          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.12)',
-          border: '1px solid rgba(255, 255, 255, 0.25)',
+          boxShadow: glassMode === 'A'
+            ? '0 4px 24px rgba(0,0,0,0.15), inset 0 0 8px rgba(255,255,255,0.1)'
+            : '0 4px 24px rgba(0, 0, 0, 0.12)',
+          border: glassMode === 'A' ? '1.5px solid rgba(255,255,255,0.25)' : '1px solid rgba(255, 255, 255, 0.25)',
+          filter: glassMode === 'A' ? 'url(#convex-lens)' : undefined,
         }}
       >
         <div
@@ -266,6 +318,67 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
             {typography(false)}
           </div>
         </div>
+        {/* Convex lens visual cues (Mode A): vignette + glass highlight */}
+        {glassMode === 'A' && (
+          <>
+            {/* Vignette: edges darken like real lens */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, transparent 45%, rgba(0,0,0,0.12) 70%, rgba(0,0,0,0.3) 100%)',
+                pointerEvents: 'none',
+              }}
+            />
+            {/* Glass specular highlight: diagonal white reflection */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.08) 30%, transparent 50%, transparent 100%)',
+                pointerEvents: 'none',
+              }}
+            />
+          </>
+        )}
+        {/* Mockup B: blur feathering overlay */}
+        {glassMode === 'B' && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, transparent 50%, rgba(255,255,255,0.6) 85%, rgba(255,255,255,0.9) 100%)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              mask: 'radial-gradient(circle, transparent 55%, black 80%)',
+              WebkitMask: 'radial-gradient(circle, transparent 55%, black 80%)',
+              pointerEvents: 'none',
+            }}
+          />
+        )}
+      </div>
+
+      {/* Toggle UI */}
+      <div className="absolute bottom-4 right-5 sm:right-10 lg:right-[55px] flex gap-2 z-20">
+        <button
+          onClick={() => setGlassMode('A')}
+          className={`px-3 py-1.5 text-xs font-medium border transition-colors ${
+            glassMode === 'A' ? 'bg-black text-white border-black' : 'bg-white/80 text-black border-gray-300 hover:bg-white'
+          }`}
+        >
+          시안 A
+        </button>
+        <button
+          onClick={() => setGlassMode('B')}
+          className={`px-3 py-1.5 text-xs font-medium border transition-colors ${
+            glassMode === 'B' ? 'bg-black text-white border-black' : 'bg-white/80 text-black border-gray-300 hover:bg-white'
+          }`}
+        >
+          시안 B
+        </button>
       </div>
     </div>
   );

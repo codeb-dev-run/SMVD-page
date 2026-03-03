@@ -52,6 +52,26 @@ export default function NewsArticleModal({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [template, setTemplate] = useState<'notice' | 'event' | 'custom'>('custom');
+
+  const handleTemplateChange = (tpl: 'notice' | 'event' | 'custom') => {
+    setTemplate(tpl);
+    if (tpl === 'notice') {
+      setIntroTitle(title);
+      setIntroText('');
+      setHasGallery(false);
+      setGallery(emptyGallery);
+    } else if (tpl === 'event') {
+      setIntroTitle(title);
+      setHasGallery(true);
+      setGallery(emptyGallery);
+    } else {
+      setIntroTitle('');
+      setIntroText('');
+      setHasGallery(false);
+      setGallery(emptyGallery);
+    }
+  };
 
   // Reset form when modal opens or article changes
   useEffect(() => {
@@ -206,60 +226,106 @@ export default function NewsArticleModal({
             </div>
           </div>
 
-          {/* Excerpt */}
+          {/* 발행일 */}
           <div>
-            <label htmlFor="article-excerpt" className="block text-sm font-medium text-gray-700 mb-1">
-              요약 (목록에 표시)
+            <label htmlFor="article-date" className="block text-sm font-medium text-gray-700 mb-1">
+              발행일 *
             </label>
-            <textarea
-              id="article-excerpt"
-              value={excerpt}
-              onChange={(e) => setExcerpt(e.target.value)}
-              placeholder="목록에 표시될 2줄 요약..."
-              rows={2}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-y"
+            <input
+              id="article-date"
+              type="date"
+              value={publishedAt}
+              onChange={(e) => setPublishedAt(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
             />
           </div>
 
-          {/* Row: Thumbnail + Date */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="article-thumbnail" className="block text-sm font-medium text-gray-700 mb-1">
-                썸네일 이미지 경로
-              </label>
-              <input
-                id="article-thumbnail"
-                type="text"
-                value={thumbnailImage}
-                onChange={(e) => setThumbnailImage(e.target.value)}
-                placeholder="/Group-27.svg"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              />
-              {thumbnailImage && (
-                <div className="mt-2 w-20 h-20 bg-gray-100 rounded overflow-hidden">
-                  <img src={thumbnailImage} alt="Thumbnail preview" className="w-full h-full object-cover" />
-                </div>
-              )}
+          {/* 추가 정보 (선택사항) */}
+          <details className="border border-gray-200 rounded-lg">
+            <summary className="px-4 py-3 text-sm font-medium text-gray-700 cursor-pointer select-none hover:bg-gray-50 rounded-lg">
+              추가 정보 (선택사항)
+            </summary>
+            <div className="px-4 pb-4 pt-3 space-y-4 border-t border-gray-200">
+              {/* Excerpt */}
+              <div>
+                <label htmlFor="article-excerpt" className="block text-sm font-medium text-gray-700 mb-1">
+                  요약 (목록에 표시)
+                </label>
+                <textarea
+                  id="article-excerpt"
+                  value={excerpt}
+                  onChange={(e) => setExcerpt(e.target.value)}
+                  placeholder="목록에 표시될 2줄 요약..."
+                  rows={2}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-y"
+                />
+              </div>
+
+              {/* Thumbnail */}
+              <div>
+                <label htmlFor="article-thumbnail" className="block text-sm font-medium text-gray-700 mb-1">
+                  썸네일 이미지 경로
+                </label>
+                <input
+                  id="article-thumbnail"
+                  type="text"
+                  value={thumbnailImage}
+                  onChange={(e) => setThumbnailImage(e.target.value)}
+                  placeholder="/Group-27.svg"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                />
+                {thumbnailImage && (
+                  <div className="mt-2 w-20 h-20 bg-gray-100 rounded overflow-hidden">
+                    <img src={thumbnailImage} alt="Thumbnail preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
+              </div>
+
+              {/* Published */}
+              <div className="flex items-center gap-2">
+                <input
+                  id="article-published"
+                  type="checkbox"
+                  checked={published}
+                  onChange={(e) => setPublished(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="article-published" className="text-sm font-medium text-gray-700">
+                  공개
+                </label>
+              </div>
             </div>
-            <div>
-              <label htmlFor="article-date" className="block text-sm font-medium text-gray-700 mb-1">
-                발행일
-              </label>
-              <input
-                id="article-date"
-                type="date"
-                value={publishedAt}
-                onChange={(e) => setPublishedAt(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              />
-            </div>
-          </div>
+          </details>
 
           {/* Divider - Content Section */}
           <div className="border-t border-gray-200 pt-5">
             <h3 className="text-sm font-semibold text-gray-800 mb-3">
               상세 페이지 콘텐츠 (선택)
             </h3>
+
+            {/* Template Buttons */}
+            <div className="flex gap-2 mb-4">
+              {(
+                [
+                  { key: 'notice', label: '공지 기본' },
+                  { key: 'event', label: '이벤트 기본' },
+                  { key: 'custom', label: '직접 작성' },
+                ] as const
+              ).map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => handleTemplateChange(key)}
+                  className={`px-3 py-1.5 text-sm font-medium border rounded-lg transition-colors ${
+                    template === key
+                      ? 'bg-blue-100 border-blue-500 text-blue-700'
+                      : 'bg-gray-50 border-gray-300 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Intro Title */}
@@ -310,20 +376,6 @@ export default function NewsArticleModal({
           {hasGallery && (
             <GalleryEditor gallery={gallery} onChange={setGallery} />
           )}
-
-          {/* Published */}
-          <div className="flex items-center gap-2">
-            <input
-              id="article-published"
-              type="checkbox"
-              checked={published}
-              onChange={(e) => setPublished(e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <label htmlFor="article-published" className="text-sm font-medium text-gray-700">
-              공개
-            </label>
-          </div>
 
           {/* Error */}
           {error && (

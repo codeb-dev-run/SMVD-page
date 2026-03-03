@@ -35,7 +35,14 @@ export default function ExhibitionSection({
     },
   ],
 }: ExhibitionSectionProps) {
-  const sectionRef = useScrollReveal({ y: 40, duration: 0.8, start: 'top 85%' });
+  const sectionRef = useScrollReveal({
+    selector: '[data-exhibition-card]',
+    stagger: 0.15,
+    x: -30,
+    y: 0,
+    duration: 0.6,
+    start: 'top 80%',
+  });
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const dragState = useRef({
@@ -206,6 +213,7 @@ export default function ExhibitionSection({
           {items.map((item, idx) => (
             <div
               key={idx}
+              data-exhibition-card
               className="flex-none flex flex-col gap-5 select-none w-full sm:w-[calc(50%-12px)] lg:w-[calc((100%-80px)/3)] cursor-pointer"
               onMouseEnter={handleCardEnter}
               onMouseLeave={handleCardLeave}
@@ -247,13 +255,13 @@ export default function ExhibitionSection({
                     draggable={false}
                     quality={80}
                   />
-                  {/* Hover: dark gradient overlay */}
+                  {/* Hover: bottom gradient overlay for text readability */}
                   <div
                     data-exhibition-overlay
                     className="absolute inset-0 pointer-events-none"
                     style={{
                       opacity: 0,
-                      background: 'linear-gradient(180deg, rgba(59, 55, 100, 0.7) 0%, rgba(30, 28, 60, 0.92) 100%)',
+                      background: 'linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.65) 100%)',
                     }}
                   />
                   {/* Hover: exhibition title */}
