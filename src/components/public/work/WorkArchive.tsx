@@ -226,32 +226,6 @@ export default function WorkArchive({
       <Suspense fallback={null}>
         <WorkTabController onTabSelect={setActiveTab} />
       </Suspense>
-      {/* Achieve / Exhibition Tabs */}
-      <div className="flex gap-4 sm:gap-5 w-full pb-4 sm:pb-5 border-b-2 border-neutral-1450">
-        <button
-          onClick={() => {
-            setActiveTab('achieve');
-            setCurrentPage(1);
-          }}
-          className={`text-[18px] sm:text-[20px] lg:text-[24px] font-bold font-satoshi bg-transparent border-none cursor-pointer py-2 m-0 transition-all duration-300 ease-in-out ${
-            activeTab === 'achieve' ? 'text-[#1b1d1f]' : 'text-[#7b828e]'
-          }`}
-        >
-          Achieve
-        </button>
-        <button
-          onClick={() => {
-            setActiveTab('exhibition');
-            setCurrentPage(1);
-          }}
-          className={`text-[18px] sm:text-[20px] lg:text-[24px] font-bold font-satoshi bg-transparent border-none cursor-pointer py-2 m-0 transition-all duration-300 ease-in-out ${
-            activeTab === 'exhibition' ? 'text-[#1b1d1f]' : 'text-[#7b828e]'
-          }`}
-        >
-          Exhibition
-        </button>
-      </div>
-
       {/* Archive Section Header - Only show for Achieve tab */}
       {activeTab === 'achieve' && (
         <WorkHeader

@@ -3,7 +3,6 @@
 import { SessionProvider } from "next-auth/react";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { CursorGlassEffect } from "@/components/common/CursorGlassEffect";
 
 function HashScroller({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -36,7 +35,6 @@ function ProvidersContent({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {!isAdminPage && <CursorGlassEffect />}
       <HashScroller>{children}</HashScroller>
     </>
   );

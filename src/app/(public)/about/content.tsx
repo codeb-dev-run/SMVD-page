@@ -76,32 +76,6 @@ export default function AboutContent({
         <TabController onTabSelect={setActiveTab} />
       </Suspense>
       <div className="max-w-[1440px] mx-auto flex flex-col gap-10 lg:gap-[50px]">
-        {/* Tab Buttons */}
-        <div className="flex gap-5 sm:gap-[30px] lg:gap-10 border-b-2 border-neutral-1450 pb-4 sm:pb-5">
-          <button
-            onClick={() => {
-              setActiveTab('major');
-              router.push('/about');
-            }}
-            className={`bg-transparent border-none text-[18px] sm:text-[20px] lg:text-[24px] font-satoshi cursor-pointer py-2 m-0 transition-all duration-200 ease-in ${
-              activeTab === 'major' ? 'font-bold text-neutral-1450' : 'font-normal text-[#7b828eff]'
-            }`}
-          >
-            About Major
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab('people');
-              router.push('/about?tab=people');
-            }}
-            className={`bg-transparent border-none text-[18px] sm:text-[20px] lg:text-[24px] font-satoshi cursor-pointer py-2 m-0 transition-all duration-200 ease-in ${
-              activeTab === 'people' ? 'font-bold text-neutral-1450' : 'font-normal text-[#7b828eff]'
-            }`}
-          >
-            Our People
-          </button>
-        </div>
-
         {/* About Major Tab */}
         {activeTab === 'major' && (
           <div id="sections" className="flex flex-col gap-10 lg:gap-[50px]">
