@@ -91,48 +91,21 @@ export default function WorkSection({
     // Initial state: content hidden
     gsap.set(content, { opacity: 0 });
 
-    const proxy = { p: 0 };
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: el,
-        start: 'top 5%',
-        end: '+=2800',
-        pin: true,
-        pinSpacing: true,
-        scrub: 1.5,
-        onLeave: () => {
-          animationDoneRef.current = true;
-          isCycling.current = false;
-          setShowAllFilters(true);
-          setActiveCategory('All');
-          tl.scrollTrigger?.kill();
-          tl.kill();
-          // Clear residual pin styles to restore sticky behavior
-          gsap.set(el, { clearProps: 'all' });
-          gsap.set(content, { opacity: 1 });
-        },
-      },
-    });
-
-    tl.to(proxy, {
-      p: 1,
-      duration: 1,
-      ease: 'none',
-      onUpdate: () => {
-        const p = proxy.p;
+    const trigger = ScrollTrigger.create({
+      trigger: el,
+      start: 'top 5%',
+      end: '+=2800',
+      pin: true,
+      pinSpacing: true,
+      onUpdate: (self) => {
+        const p = self.progress;
 
         // Forward only: ignore reverse scroll
-        if (p < maxProgress) {
-          gsap.set(content, { opacity: 1 });
-          return;
-        }
+        if (p < maxProgress) return;
         maxProgress = p;
 
         // Dead zone: pinned but content stays hidden
-        if (p < DEAD_ZONE) {
-          gsap.set(content, { opacity: 0 });
-          return;
-        }
+        if (p < DEAD_ZONE) return;
 
         // Map progress to category index
         const adjusted = (p - DEAD_ZONE) / (1 - DEAD_ZONE);
@@ -141,39 +114,54 @@ export default function WorkSection({
           cycleOrder.length - 1,
         );
 
-        // Sub-progress within current category slot (0 to 1)
-        const slotSize = 1 / cycleOrder.length;
-        const slotProgress = (adjusted - catIdx * slotSize) / slotSize;
-
-        // Category change
         if (catIdx !== lastCatIdx) {
           lastCatIdx = catIdx;
-          if (!isCycling.current) {
-            isCycling.current = true;
-            setShowAllFilters(false);
-          }
-          setActiveCategory(cycleOrder[catIdx]);
-          if (catIdx === cycleOrder.length - 1) {
-            isCycling.current = false;
-            setShowAllFilters(true);
-          }
-        }
+          // Kill any running fade tweens to prevent overlap
+          gsap.killTweensOf(content);
 
-        // Opacity per slot: fade-in → hold → fade-out (last slot: no fade-out)
-        const isLast = catIdx === cycleOrder.length - 1;
-        let opacity = 1;
-        if (slotProgress < 0.3) {
-          opacity = slotProgress / 0.3;
-        } else if (slotProgress > 0.7 && !isLast) {
-          opacity = 1 - (slotProgress - 0.7) / 0.3;
+          if (catIdx === 0) {
+            // First category: fade in from hidden
+            if (!isCycling.current) {
+              isCycling.current = true;
+              setShowAllFilters(false);
+            }
+            setActiveCategory(cycleOrder[0]);
+            gsap.fromTo(content, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power2.out' });
+          } else {
+            // Subsequent: fixed-duration fade out → swap → fade in
+            const isLast = catIdx === cycleOrder.length - 1;
+            gsap.to(content, {
+              opacity: 0,
+              duration: 0.25,
+              ease: 'power2.in',
+              onComplete: () => {
+                setActiveCategory(cycleOrder[catIdx]);
+                if (isLast) {
+                  isCycling.current = false;
+                  setShowAllFilters(true);
+                }
+                gsap.to(content, { opacity: 1, duration: 0.35, ease: 'power2.out' });
+              },
+            });
+          }
         }
-        gsap.set(content, { opacity });
+      },
+      onLeave: () => {
+        animationDoneRef.current = true;
+        isCycling.current = false;
+        setShowAllFilters(true);
+        setActiveCategory('All');
+        gsap.killTweensOf(content);
+        trigger.kill();
+        // Clear residual pin styles to restore sticky behavior
+        gsap.set(el, { clearProps: 'all' });
+        gsap.set(content, { opacity: 1 });
       },
     });
 
     return () => {
-      tl.scrollTrigger?.kill();
-      tl.kill();
+      gsap.killTweensOf(content);
+      trigger.kill();
     };
   }, []);
 
