@@ -92,14 +92,16 @@ export default function WorkSection({
     let lastIdx = -1;
     let fadeTimeout: number | null = null;
 
+    let cyclingDone = false;
+
     const trigger = ScrollTrigger.create({
       trigger: el,
       start: 'top 15%',
       end: `+=${cycleOrder.length * 300}`,
       pin: true,
       pinSpacing: true,
-      once: true,
       onUpdate: (self) => {
+        if (cyclingDone) return;
         const idx = Math.min(
           Math.floor(self.progress * cycleOrder.length),
           cycleOrder.length - 1,
@@ -121,6 +123,12 @@ export default function WorkSection({
             }
           }, 200);
         }
+      },
+      onLeave: () => {
+        cyclingDone = true;
+        trigger.kill();
+        // Clear residual pin styles (transform etc.) to restore sticky behavior
+        gsap.set(el, { clearProps: 'all' });
       },
     });
 
