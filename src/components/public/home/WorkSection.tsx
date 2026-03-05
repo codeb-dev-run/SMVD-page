@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { gsap, ScrollTrigger } from '@/lib/gsap';
-import { useScrollReveal } from '@/hooks/useScrollReveal';
 
 interface WorkItem {
   src: string;
@@ -40,13 +39,13 @@ export default function WorkSection({
 }: WorkSectionProps) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
-  const [cardsOpacity, setCardsOpacity] = useState(1);
-  const [showAllFilters, setShowAllFilters] = useState(true);
-  const gridRef = useScrollReveal({ selector: '[data-work-card]', stagger: 0.1, y: 50 });
+  const [showAllFilters, setShowAllFilters] = useState(false);
   const [showFloatingLabel, setShowFloatingLabel] = useState(false);
   const isCycling = useRef(false);
   const sectionTriggerRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const animationDoneRef = useRef(false);
 
   // Floating label: show when header scrolls out, hide when section leaves
   useEffect(() => {
@@ -73,70 +72,129 @@ export default function WorkSection({
     return () => { headerObs.disconnect(); sectionObs.disconnect(); };
   }, []);
 
-  // Fade-out → swap category → fade-in (for manual clicks)
-  const fadeTo = useCallback((cat: string) => {
-    setCardsOpacity(0);
-    setTimeout(() => {
-      setActiveCategory(cat);
-      setTimeout(() => setCardsOpacity(1), 30);
-    }, 300);
-  }, []);
-
-  // Scroll-based category cycling with pin
+  // Scroll-based category cycling with pin + scrub (speed-normalized)
   useEffect(() => {
     const el = sectionTriggerRef.current;
-    if (!el) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const content = contentRef.current;
+    if (!el || !content) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      gsap.set(content, { opacity: 1 });
+      setShowAllFilters(true);
+      return;
+    }
 
     const cycleOrder = ['UX/UI', 'Motion', 'Branding', 'Game design', 'Graphic', 'All'];
-    let lastIdx = -1;
-    let fadeTimeout: number | null = null;
+    const DEAD_ZONE = 0.12;
+    let lastCatIdx = -1;
+    let maxProgress = 0;
 
-    let cyclingDone = false;
+    // Initial state: content hidden
+    gsap.set(content, { opacity: 0 });
 
-    const trigger = ScrollTrigger.create({
-      trigger: el,
-      start: 'top 15%',
-      end: `+=${cycleOrder.length * 300}`,
-      pin: true,
-      pinSpacing: true,
-      onUpdate: (self) => {
-        if (cyclingDone) return;
-        const idx = Math.min(
-          Math.floor(self.progress * cycleOrder.length),
+    const proxy = { p: 0 };
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: el,
+        start: 'top 5%',
+        end: '+=2800',
+        pin: true,
+        pinSpacing: true,
+        scrub: 1.5,
+        onLeave: () => {
+          animationDoneRef.current = true;
+          isCycling.current = false;
+          setShowAllFilters(true);
+          setActiveCategory('All');
+          tl.scrollTrigger?.kill();
+          tl.kill();
+          // Clear residual pin styles to restore sticky behavior
+          gsap.set(el, { clearProps: 'all' });
+          gsap.set(content, { opacity: 1 });
+        },
+      },
+    });
+
+    tl.to(proxy, {
+      p: 1,
+      duration: 1,
+      ease: 'none',
+      onUpdate: () => {
+        const p = proxy.p;
+
+        // Forward only: ignore reverse scroll
+        if (p < maxProgress) {
+          gsap.set(content, { opacity: 1 });
+          return;
+        }
+        maxProgress = p;
+
+        // Dead zone: pinned but content stays hidden
+        if (p < DEAD_ZONE) {
+          gsap.set(content, { opacity: 0 });
+          return;
+        }
+
+        // Map progress to category index
+        const adjusted = (p - DEAD_ZONE) / (1 - DEAD_ZONE);
+        const catIdx = Math.min(
+          Math.floor(adjusted * cycleOrder.length),
           cycleOrder.length - 1,
         );
-        if (idx !== lastIdx) {
-          lastIdx = idx;
+
+        // Sub-progress within current category slot (0 to 1)
+        const slotSize = 1 / cycleOrder.length;
+        const slotProgress = (adjusted - catIdx * slotSize) / slotSize;
+
+        // Category change
+        if (catIdx !== lastCatIdx) {
+          lastCatIdx = catIdx;
           if (!isCycling.current) {
             isCycling.current = true;
             setShowAllFilters(false);
           }
-          if (fadeTimeout) clearTimeout(fadeTimeout);
-          setCardsOpacity(0);
-          fadeTimeout = window.setTimeout(() => {
-            setActiveCategory(cycleOrder[idx]);
-            requestAnimationFrame(() => setCardsOpacity(1));
-            if (idx === cycleOrder.length - 1) {
-              isCycling.current = false;
-              setShowAllFilters(true);
-            }
-          }, 200);
+          setActiveCategory(cycleOrder[catIdx]);
+          if (catIdx === cycleOrder.length - 1) {
+            isCycling.current = false;
+            setShowAllFilters(true);
+          }
         }
-      },
-      onLeave: () => {
-        cyclingDone = true;
-        trigger.kill();
-        // Clear residual pin styles (transform etc.) to restore sticky behavior
-        gsap.set(el, { clearProps: 'all' });
+
+        // Opacity per slot: fade-in → hold → fade-out (last slot: no fade-out)
+        const isLast = catIdx === cycleOrder.length - 1;
+        let opacity = 1;
+        if (slotProgress < 0.3) {
+          opacity = slotProgress / 0.3;
+        } else if (slotProgress > 0.7 && !isLast) {
+          opacity = 1 - (slotProgress - 0.7) / 0.3;
+        }
+        gsap.set(content, { opacity });
       },
     });
 
     return () => {
-      trigger.kill();
-      if (fadeTimeout) clearTimeout(fadeTimeout);
+      tl.scrollTrigger?.kill();
+      tl.kill();
     };
   }, []);
+
+  // Manual category click (after animation completes)
+  const handleCategoryClick = useCallback((cat: string) => {
+    if (cat === activeCategory || isCycling.current) return;
+    const content = contentRef.current;
+    if (!content) {
+      setActiveCategory(cat);
+      return;
+    }
+    gsap.to(content, {
+      opacity: 0,
+      duration: 0.25,
+      ease: 'power2.in',
+      onComplete: () => {
+        setActiveCategory(cat);
+        gsap.to(content, { opacity: 1, duration: 0.3, ease: 'power2.out' });
+      },
+    });
+  }, [activeCategory]);
 
   const handleCardEnter = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -157,11 +215,6 @@ export default function WorkSection({
       );
 
   const totalRows = Math.ceil(filteredItems.length / 2);
-
-  const handleCategoryClick = useCallback((cat: string) => {
-    if (cat === activeCategory || isCycling.current) return;
-    fadeTo(cat);
-  }, [activeCategory, fadeTo]);
 
   const filterButtons = (textClass: string, isVertical: boolean) =>
     categories.map((category, idx) => {
@@ -230,15 +283,15 @@ export default function WorkSection({
         </div>
       </div>
 
-      {/* Content */}
-      <div className="w-full max-w-[1440px] mx-auto">
+      {/* Content (opacity controlled by GSAP) */}
+      <div ref={contentRef} className="w-full max-w-[1440px] mx-auto">
         {/* Mobile/Tablet filter (horizontal, on top) */}
         <div className="flex lg:hidden flex-row gap-2 overflow-x-auto pb-2 mb-6">
           {filterButtons('text-[18px] sm:text-[22px]', false)}
         </div>
 
         {/* Grid: 3-col on desktop (col1=cards, col2=filter sticky, col3=cards), 2-col tablet, 1-col mobile */}
-        <div ref={gridRef} role="list" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr] gap-x-0 sm:gap-x-8 lg:gap-x-[50px] gap-y-6 sm:gap-y-8 lg:gap-y-10">
+        <div role="list" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr] gap-x-0 sm:gap-x-8 lg:gap-x-[50px] gap-y-6 sm:gap-y-8 lg:gap-y-10">
           {/* Desktop: center filter in grid col 2, sticky */}
           <div
             className="hidden lg:flex flex-col gap-[2px] col-start-2 sticky top-[100px] self-start pt-1"
@@ -261,7 +314,7 @@ export default function WorkSection({
                 href={href}
                 role="listitem"
                 className="flex flex-col lg:col-(--desk-col) lg:row-(--desk-row) cursor-pointer no-underline text-inherit"
-                style={{ ...gridStyle, opacity: cardsOpacity, transition: 'opacity 0.3s ease-in-out' }}
+                style={gridStyle}
               >
                 <div
                   data-work-card
