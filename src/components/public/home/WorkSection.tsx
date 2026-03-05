@@ -44,11 +44,9 @@ export default function WorkSection({
   const [showAllFilters, setShowAllFilters] = useState(true);
   const gridRef = useScrollReveal({ selector: '[data-work-card]', stagger: 0.1, y: 50 });
   const [showFloatingLabel, setShowFloatingLabel] = useState(false);
-  const hasAutoCycled = useRef(false);
   const isCycling = useRef(false);
   const sectionTriggerRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const cycleTimeouts = useRef<number[]>([]);
 
   // Floating label: show when header scrolls out, hide when section leaves
   useEffect(() => {
@@ -75,62 +73,62 @@ export default function WorkSection({
     return () => { headerObs.disconnect(); sectionObs.disconnect(); };
   }, []);
 
-  // Fade-out → swap category → fade-in
-  const fadeTo = useCallback((cat: string, onDone?: () => void) => {
+  // Fade-out → swap category → fade-in (for manual clicks)
+  const fadeTo = useCallback((cat: string) => {
     setCardsOpacity(0);
-    const id = window.setTimeout(() => {
+    setTimeout(() => {
       setActiveCategory(cat);
-      // Wait for React to render new cards at opacity 0, then fade in
       setTimeout(() => setCardsOpacity(1), 30);
-      onDone?.();
     }, 300);
-    cycleTimeouts.current.push(id);
   }, []);
 
-  // Auto-cycle with fade on scroll enter
+  // Scroll-based category cycling with pin
   useEffect(() => {
     const el = sectionTriggerRef.current;
-    if (!el || hasAutoCycled.current) return;
+    if (!el) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const cycleOrder = ['UX/UI', 'Motion', 'Branding', 'Game design', 'Graphic', 'All'];
-
-    const cycleTo = (idx: number) => {
-      if (idx >= cycleOrder.length) {
-        isCycling.current = false;
-        // Cycle done → reveal all filter buttons with stagger
-        setShowAllFilters(true);
-        return;
-      }
-      fadeTo(cycleOrder[idx], () => {
-        if (idx + 1 < cycleOrder.length) {
-          const nextId = window.setTimeout(() => cycleTo(idx + 1), 700);
-          cycleTimeouts.current.push(nextId);
-        } else {
-          isCycling.current = false;
-          setShowAllFilters(true);
-        }
-      });
-    };
+    let lastIdx = -1;
+    let fadeTimeout: number | null = null;
 
     const trigger = ScrollTrigger.create({
       trigger: el,
-      start: 'top 75%',
+      start: 'top 15%',
+      end: `+=${cycleOrder.length * 300}`,
+      pin: true,
+      pinSpacing: true,
       once: true,
-      onEnter: () => {
-        if (hasAutoCycled.current) return;
-        hasAutoCycled.current = true;
-        isCycling.current = true;
-        setShowAllFilters(false); // Hide non-active filters during cycling
-        cycleTo(0);
+      onUpdate: (self) => {
+        const idx = Math.min(
+          Math.floor(self.progress * cycleOrder.length),
+          cycleOrder.length - 1,
+        );
+        if (idx !== lastIdx) {
+          lastIdx = idx;
+          if (!isCycling.current) {
+            isCycling.current = true;
+            setShowAllFilters(false);
+          }
+          if (fadeTimeout) clearTimeout(fadeTimeout);
+          setCardsOpacity(0);
+          fadeTimeout = window.setTimeout(() => {
+            setActiveCategory(cycleOrder[idx]);
+            requestAnimationFrame(() => setCardsOpacity(1));
+            if (idx === cycleOrder.length - 1) {
+              isCycling.current = false;
+              setShowAllFilters(true);
+            }
+          }, 200);
+        }
       },
     });
 
     return () => {
       trigger.kill();
-      cycleTimeouts.current.forEach(id => clearTimeout(id));
+      if (fadeTimeout) clearTimeout(fadeTimeout);
     };
-  }, [fadeTo]);
+  }, []);
 
   const handleCardEnter = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
