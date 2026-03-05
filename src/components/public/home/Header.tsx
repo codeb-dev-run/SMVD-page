@@ -81,9 +81,16 @@ export function Header({ navigation, headerConfig, animateOnMount = true }: Head
     return pathname.startsWith(href);
   };
 
-  // CMS에서 네비게이션을 받으면 그것 사용, 아니면 기본값 사용
+  // CMS navigation에 기본 드롭다운 children 병합
+  const defaultChildrenMap = new Map(
+    DEFAULT_NAV_ITEMS.filter(i => i.children).map(i => [i.label, i.children]),
+  );
   const navItems: NavItemConfig[] = navigation && navigation.length > 0
-    ? navigation.map(item => ({ label: item.label, href: item.href }))
+    ? navigation.map(item => ({
+        label: item.label,
+        href: item.href,
+        children: defaultChildrenMap.get(item.label),
+      }))
     : DEFAULT_NAV_ITEMS;
 
   return (
