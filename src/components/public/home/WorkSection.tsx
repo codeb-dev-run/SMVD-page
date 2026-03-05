@@ -38,10 +38,10 @@ export default function WorkSection({
   title = 'Work',
   items = workItems,
 }: WorkSectionProps) {
-  const [activeCategory, setActiveCategory] = useState('UX/UI');
+  const [activeCategory, setActiveCategory] = useState('All');
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
-  const [cardsOpacity, setCardsOpacity] = useState(0);
-  const [showAllFilters, setShowAllFilters] = useState(false);
+  const [cardsOpacity, setCardsOpacity] = useState(1);
+  const [showAllFilters, setShowAllFilters] = useState(true);
   const gridRef = useScrollReveal({ selector: '[data-work-card]', stagger: 0.1, y: 50 });
   const [showFloatingLabel, setShowFloatingLabel] = useState(false);
   const isCycling = useRef(false);
