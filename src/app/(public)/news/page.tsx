@@ -61,24 +61,8 @@ export default async function NewsPage() {
       <Header />
 
       {/* Main Content Container */}
-      <div
-        style={{
-          width: '100%',
-          boxSizing: 'border-box',
-          paddingTop: '0px',
-          paddingBottom: '61px',
-          backgroundColor: '#ffffffff',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: '1440px',
-            margin: '0 auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '100px',
-          }}
-        >
+      <div className="w-full max-w-[1440px] mx-auto pb-[61px] px-4 sm:px-6 lg:px-10 bg-[#ffffffff]">
+        <div className="flex flex-col gap-[100px]">
           {/* News&Event Archive Component */}
           <NewsEventArchive items={newsItems} />
         </div>

@@ -76,25 +76,8 @@ export default async function WorkPage() {
       <Header />
 
       {/* Main Content Container */}
-      <div
-        style={{
-          width: '100%',
-          paddingTop: '0px',
-          paddingBottom: '61px',
-          paddingLeft: '40px',
-          paddingRight: '40px',
-          backgroundColor: '#ffffffff',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: '1440px',
-            margin: '0 auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '100px',
-          }}
-        >
+      <div className="w-full max-w-[1440px] mx-auto pb-[61px] px-5 sm:px-10 lg:px-10 bg-[#ffffffff]">
+        <div className="flex flex-col gap-[100px]">
           {/* Work Archive Component */}
           <WorkArchive
             portfolioItemsFromDB={workData?.projects}

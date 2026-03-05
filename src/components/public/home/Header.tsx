@@ -89,7 +89,7 @@ export function Header({ navigation, headerConfig, animateOnMount = true }: Head
   return (
     <header
       ref={headerRef}
-      className="w-full h-[64px] sm:h-[72px] lg:h-[80px] bg-[#ffffffff] flex items-center px-5 sm:px-10 lg:px-[55.5px]"
+      className="w-full h-[64px] sm:h-[72px] lg:h-[80px] bg-[#ffffffff] flex items-center px-5 sm:px-10 lg:px-10"
     >
       {/* Logo */}
       <Link

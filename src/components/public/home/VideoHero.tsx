@@ -195,7 +195,7 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
   // Shared typography JSX
   const typography = (isMainLayer: boolean) => (
     <>
-      <div className="absolute top-6 sm:top-10 lg:top-20 left-5 sm:left-10 lg:left-[55px]">
+      <div className="absolute top-6 sm:top-10 lg:top-20 left-5 sm:left-10 lg:left-10">
         <p
           className="text-[11px] sm:text-[13px] lg:text-[16px] text-black leading-[1.4] m-0"
           style={{ fontFamily: 'var(--font-heading)', fontWeight: 500 }}
@@ -214,7 +214,7 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
           Visual Media Design
         </h1>
       </div>
-      <div className="absolute bottom-[28%] sm:bottom-[25%] lg:bottom-[220px] right-5 sm:right-10 lg:right-[55px] text-right">
+      <div className="absolute bottom-[28%] sm:bottom-[25%] lg:bottom-[220px] right-5 sm:right-10 lg:right-10 text-right">
         <p
           className="text-[11px] sm:text-[13px] lg:text-[16px] text-black leading-[1.4] m-0"
           style={{ fontFamily: 'var(--font-heading)', fontWeight: 700 }}
@@ -362,7 +362,7 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
       </div>
 
       {/* Toggle UI */}
-      <div className="absolute bottom-4 right-5 sm:right-10 lg:right-[55px] flex gap-2 z-20">
+      <div className="absolute bottom-4 right-5 sm:right-10 lg:right-10 flex gap-2 z-20">
         <button
           onClick={() => setGlassMode('A')}
           className={`px-3 py-1.5 text-xs font-medium border transition-colors ${

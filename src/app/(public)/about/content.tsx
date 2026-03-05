@@ -71,7 +71,7 @@ export default function AboutContent({
   const [activeTab, setActiveTab] = useState<'major' | 'people'>('major');
 
   return (
-    <div className="w-full pt-0 pb-[61px] px-5 sm:px-10 lg:px-[55.5px] bg-[#ffffffff]">
+    <div className="w-full pt-0 pb-[61px] px-5 sm:px-10 lg:px-10 bg-[#ffffffff]">
       <Suspense fallback={null}>
         <TabController onTabSelect={setActiveTab} />
       </Suspense>

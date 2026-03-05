@@ -60,10 +60,10 @@ export function Footer({ data, socialLinks }: FooterProps) {
   return (
     <footer
       ref={footerRef}
-      className="w-full bg-[#eaeef4] px-4 sm:px-10 lg:px-10"
+      className="w-full bg-[#eaeef4]"
     >
       <div
-        className="max-w-[1440px] mx-auto py-10 sm:py-[60px] lg:py-[60px] flex flex-col justify-center"
+        className="max-w-[1440px] mx-auto px-4 sm:px-10 lg:px-10 py-10 sm:py-[60px] lg:py-[60px] flex flex-col justify-center"
       >
         {/* Logo + University Name */}
         <div className="flex flex-col gap-1">

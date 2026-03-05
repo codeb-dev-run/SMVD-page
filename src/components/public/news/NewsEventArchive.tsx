@@ -103,7 +103,7 @@ export default function NewsEventArchive({ items }: NewsEventArchiveProps) {
   const newsItems = items ?? defaultNewsItems;
 
   return (
-    <div className="flex flex-col gap-4 w-full px-4 sm:px-6 lg:px-10">
+    <div className="flex flex-col gap-4 w-full">
       {/* Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 lg:gap-10 w-full">
         {newsItems.map((item) => (

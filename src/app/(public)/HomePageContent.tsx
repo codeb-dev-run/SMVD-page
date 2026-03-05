@@ -66,7 +66,7 @@ export default function HomePageContent({
         {/* Exhibition + About with Circle Video Background (Figma: Glass Circle 1513px) */}
         <div className="relative overflow-x-clip">
           {/* Exhibition Section */}
-          <div className="relative max-w-[1440px] mx-auto px-5 sm:px-10 lg:px-[55.5px]">
+          <div className="relative max-w-[1440px] mx-auto px-5 sm:px-10 lg:px-10">
             <ExhibitionSection items={exhibitionItems} />
           </div>
 
