@@ -39,7 +39,7 @@ export default function WorkSection({
 }: WorkSectionProps) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
-  const [showAllFilters, setShowAllFilters] = useState(false);
+  const [showAllFilters, setShowAllFilters] = useState(true);
   const [showFloatingLabel, setShowFloatingLabel] = useState(false);
   const isCycling = useRef(false);
   const sectionTriggerRef = useRef<HTMLElement>(null);
@@ -123,7 +123,6 @@ export default function WorkSection({
             // First category: fade in from hidden
             if (!isCycling.current) {
               isCycling.current = true;
-              setShowAllFilters(false);
             }
             setActiveCategory(cycleOrder[0]);
             gsap.fromTo(content, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power2.out' });
@@ -138,7 +137,6 @@ export default function WorkSection({
                 setActiveCategory(cycleOrder[catIdx]);
                 if (isLast) {
                   isCycling.current = false;
-                  setShowAllFilters(true);
                 }
                 gsap.to(content, { opacity: 1, duration: 0.35, ease: 'power2.out' });
               },
@@ -149,7 +147,6 @@ export default function WorkSection({
       onLeave: () => {
         animationDoneRef.current = true;
         isCycling.current = false;
-        setShowAllFilters(true);
         setActiveCategory('All');
         gsap.killTweensOf(content);
         trigger.kill();
@@ -209,8 +206,6 @@ export default function WorkSection({
       const isSelected = activeCategory === category;
       const isHovered = hoveredCategory === category;
       const showActive = isSelected || isHovered;
-      const isVisible = showAllFilters || isSelected;
-
       return (
         <button
           key={category}
@@ -220,11 +215,7 @@ export default function WorkSection({
           aria-pressed={isSelected}
           className={`flex items-center gap-[6px] font-normal font-sans tracking-[0.4px] leading-normal whitespace-nowrap border-none cursor-pointer transition-all duration-300 ease-in-out overflow-hidden ${showActive ? 'py-1 px-2.5 bg-[#000000ff] text-[#ffffffff]' : 'py-1 px-0 bg-transparent text-[#3b3b3bff]'} ${textClass}`}
           style={{
-            opacity: isVisible ? (showActive ? 1 : 0.5) : 0,
-            ...(isVertical
-              ? { maxHeight: isVisible ? '60px' : 0, paddingTop: isVisible ? undefined : 0, paddingBottom: isVisible ? undefined : 0 }
-              : { maxWidth: isVisible ? '200px' : 0, paddingLeft: isVisible ? undefined : 0, paddingRight: isVisible ? undefined : 0 }),
-            transitionDelay: showAllFilters && !isSelected ? `${idx * 60}ms` : '0ms',
+            opacity: showActive ? 1 : 0.5,
           }}
         >
           <img

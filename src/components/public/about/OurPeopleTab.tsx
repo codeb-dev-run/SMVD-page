@@ -111,7 +111,7 @@ export default function OurPeopleTab({
         </h2>
 
         {/* Professor List - Fluid Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-5 sm:gap-3 lg:gap-5 flex-1 w-full">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-3 lg:gap-5 flex-1 w-full max-w-[1060px]">
           {professors.map((prof) => (
             <Link
               key={prof.id}
