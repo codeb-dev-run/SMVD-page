@@ -92,8 +92,7 @@ export default function WorkSection({
     let lastCatIdx = -1;
     let maxProgress = 0;
 
-    // Initial state: cards hidden, filters visible
-    gsap.set(cards, { opacity: 0 });
+    // Initial state: cards visible (All category)
 
     const trigger = ScrollTrigger.create({
       trigger: el,
@@ -123,29 +122,22 @@ export default function WorkSection({
           // Kill any running fade tweens to prevent overlap
           gsap.killTweensOf(cards);
 
-          if (catIdx === 0) {
-            // First category: fade in from hidden
-            if (!isCycling.current) {
-              isCycling.current = true;
-            }
-            setActiveCategory(cycleOrder[0]);
-            gsap.fromTo(cards, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power2.out' });
-          } else {
-            // Subsequent: fixed-duration fade out → swap → fade in
-            const isLast = catIdx === cycleOrder.length - 1;
-            gsap.to(cards, {
-              opacity: 0,
-              duration: 0.25,
-              ease: 'power2.in',
-              onComplete: () => {
-                setActiveCategory(cycleOrder[catIdx]);
-                if (isLast) {
-                  isCycling.current = false;
-                }
-                gsap.to(cards, { opacity: 1, duration: 0.35, ease: 'power2.out' });
-              },
-            });
+          if (!isCycling.current) {
+            isCycling.current = true;
           }
+          const isLast = catIdx === cycleOrder.length - 1;
+          gsap.to(cards, {
+            opacity: 0,
+            duration: 0.25,
+            ease: 'power2.in',
+            onComplete: () => {
+              setActiveCategory(cycleOrder[catIdx]);
+              if (isLast) {
+                isCycling.current = false;
+              }
+              gsap.to(cards, { opacity: 1, duration: 0.35, ease: 'power2.out' });
+            },
+          });
         }
       },
       onLeave: () => {
