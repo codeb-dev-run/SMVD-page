@@ -24,17 +24,13 @@ export const metadata = {
 
 export default async function HomePage() {
   try {
-    const [page, navigationItems, headerConfig, footer] = await Promise.all([
+    const [page, navigationItems, headerConfig, footer, homeExhibitions] = await Promise.all([
       prisma.page.findUnique({
         where: { slug: 'home' },
         include: {
           sections: {
             orderBy: { order: 'asc' },
             include: {
-              exhibitionItems: {
-                orderBy: { order: 'asc' },
-                include: { media: true },
-              },
               workPortfolios: {
                 orderBy: { order: 'asc' },
                 include: {
@@ -57,12 +53,13 @@ export default async function HomePage() {
         },
       }),
       prisma.footer.findFirst(),
+      prisma.workExhibition.findMany({
+        where: { published: true, showOnHome: true },
+        orderBy: { order: 'asc' },
+      }),
     ]);
 
     // Extract sections
-    const exhibitionSection = page?.sections.find(
-      (s) => s.type === 'EXHIBITION_SECTION'
-    );
     const workSection = page?.sections.find(
       (s) => s.type === 'WORK_PORTFOLIO'
     );
@@ -70,13 +67,13 @@ export default async function HomePage() {
       (s) => s.type === 'HOME_ABOUT'
     );
 
-    // Map exhibition items from ExhibitionItem (original posters)
-    const exhibitionItems = exhibitionSection?.exhibitionItems?.map((item) => ({
+    // Map exhibition items from WorkExhibition (showOnHome=true)
+    const exhibitionItems = homeExhibitions.map((item) => ({
       year: item.year,
-      src: normalizeMediaUrl(item.media?.filepath) || '',
-      alt: item.media?.filename || `${item.year} Exhibition`,
-      title: `${item.year} Exhibition`,
-    })) || [];
+      src: item.image,
+      alt: item.title,
+      title: item.title,
+    }));
 
     // Map work portfolios to component props
     const workItems = workSection?.workPortfolios?.map((item) => ({
