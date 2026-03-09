@@ -223,6 +223,12 @@ export default function WorkArchive({
 
   return (
     <div className="flex flex-col gap-4 w-full px-4 sm:px-6 lg:px-0">
+      {/* Page Title */}
+      <div className="w-full pb-4 sm:pb-5 border-b-2 border-neutral-1450">
+        <h1 className="text-[18px] sm:text-[20px] lg:text-[24px] font-bold font-satoshi text-[#1b1d1f] m-0 py-2">
+          Work
+        </h1>
+      </div>
       <Suspense fallback={null}>
         <WorkTabController onTabSelect={setActiveTab} />
       </Suspense>
