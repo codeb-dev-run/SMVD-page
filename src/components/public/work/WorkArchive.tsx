@@ -226,7 +226,7 @@ export default function WorkArchive({
       {/* Page Title */}
       <div className="w-full pb-4 sm:pb-5 border-b-2 border-neutral-1450">
         <h1 className="text-[18px] sm:text-[20px] lg:text-[24px] font-bold font-satoshi text-[#1b1d1f] m-0 py-2">
-          Work
+          {activeTab === 'achieve' ? 'Achieve' : 'Exhibition'}
         </h1>
       </div>
       <Suspense fallback={null}>
