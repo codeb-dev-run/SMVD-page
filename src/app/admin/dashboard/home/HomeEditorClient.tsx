@@ -2,23 +2,12 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import WorkPortfolioModal from '@/components/admin/WorkPortfolioModal';
-import ExhibitionItemModal from '@/components/admin/ExhibitionItemModal';
 import dynamic from 'next/dynamic';
-const ExhibitionItemsList = dynamic(() => import('@/components/admin/ExhibitionItemsList'), { ssr: false });
 const WorkPortfolioList = dynamic(() => import('@/components/admin/WorkPortfolioList'), { ssr: false });
 import { useHomeEditor } from '@/hooks/home';
 import { useBeforeUnload } from '@/hooks/useBeforeUnload';
 import { SaveBar } from '@/components/admin/shared/SaveBar';
 import type { Section } from '@/hooks/home';
-
-interface ExhibitionItem {
-  id: string;
-  sectionId: string;
-  year: string;
-  mediaId: string;
-  order: number;
-  media?: { id: string; filename: string; filepath: string };
-}
 
 interface WorkPortfolio {
   id: string;
@@ -49,10 +38,6 @@ export default function HomeEditorClient({ initialSections, homePageId }: HomeEd
     changeCount,
     error,
     updateAboutSectionLocal,
-    addExhibitionItem,
-    updateExhibitionItem,
-    deleteExhibitionItem,
-    reorderExhibitionItem,
     addWorkPortfolio,
     updateWorkPortfolio,
     deleteWorkPortfolio,
@@ -66,8 +51,6 @@ export default function HomeEditorClient({ initialSections, homePageId }: HomeEd
   // Modal states
   const [isWorkModalOpen, setIsWorkModalOpen] = useState(false);
   const [selectedWorkItem, setSelectedWorkItem] = useState<WorkPortfolio | null>(null);
-  const [isExhibitionModalOpen, setIsExhibitionModalOpen] = useState(false);
-  const [selectedExhibitionItem, setSelectedExhibitionItem] = useState<ExhibitionItem | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -254,8 +237,8 @@ export default function HomeEditorClient({ initialSections, homePageId }: HomeEd
             </button>
           </div>
 
-          {/* Exhibition Section */}
-          {activeSection === 'exhibition' && exhibitionSection && (
+          {/* Exhibition Section - Managed via Work CMS */}
+          {activeSection === 'exhibition' && (
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -263,30 +246,17 @@ export default function HomeEditorClient({ initialSections, homePageId }: HomeEd
                     전시회 섹션
                   </h2>
                   <p className="text-sm text-gray-600 mt-1">
-                    졸업 전시회 아이템 관리 ({exhibitionSection.exhibitionItems?.length || 0}개)
+                    전시 데이터는 Work 페이지에서 통합 관리됩니다.
+                    &quot;홈에 표시&quot; 체크된 항목이 홈에 노출됩니다.
                   </p>
                 </div>
-                <button
-                  onClick={() => {
-                    setSelectedExhibitionItem(null);
-                    setIsExhibitionModalOpen(true);
-                  }}
+                <a
+                  href="/admin/dashboard/work"
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium"
                 >
-                  + 전시회 추가
-                </button>
+                  Work CMS에서 관리 →
+                </a>
               </div>
-
-              <ExhibitionItemsList
-                items={exhibitionSection.exhibitionItems || []}
-                sectionId={exhibitionSection.id}
-                onReorder={(itemId, newOrder) => {
-                  reorderExhibitionItem(exhibitionSection.id, itemId, newOrder);
-                }}
-                onDelete={(itemId) => {
-                  deleteExhibitionItem(itemId);
-                }}
-              />
             </div>
           )}
 
@@ -427,27 +397,6 @@ export default function HomeEditorClient({ initialSections, homePageId }: HomeEd
         }}
       />
 
-      {/* Exhibition Item Modal */}
-      <ExhibitionItemModal
-        isOpen={isExhibitionModalOpen}
-        isEditing={!!selectedExhibitionItem}
-        item={selectedExhibitionItem || undefined}
-        onClose={() => {
-          setIsExhibitionModalOpen(false);
-          setSelectedExhibitionItem(null);
-        }}
-        onSubmit={(data) => {
-          const es = sections.find((s) => s.type === 'EXHIBITION_SECTION');
-          if (!es) return;
-          if (selectedExhibitionItem) {
-            updateExhibitionItem(selectedExhibitionItem.id, data);
-          } else {
-            addExhibitionItem(es.id, data);
-          }
-          setIsExhibitionModalOpen(false);
-          setSelectedExhibitionItem(null);
-        }}
-      />
     </div>
   );
 }

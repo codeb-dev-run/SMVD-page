@@ -87,6 +87,9 @@ function SortableExhibitionItem({
           {!item.published && (
             <span className="ml-2 text-orange-500 font-medium">비공개</span>
           )}
+          {item.showOnHome && (
+            <span className="ml-2 text-green-600 font-medium">홈 표시</span>
+          )}
         </p>
       </div>
 

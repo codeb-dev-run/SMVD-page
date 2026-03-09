@@ -15,6 +15,7 @@ const CreateExhibitionSchema = z.object({
   image: z.string().min(1, '이미지는 필수입니다'),
   year: z.string().default('2025'),
   published: z.boolean().default(true),
+  showOnHome: z.boolean().default(false),
 });
 
 /**
@@ -77,6 +78,7 @@ export async function POST(request: NextRequest) {
         year: data.year,
         order: nextOrder,
         published: data.published,
+        showOnHome: data.showOnHome,
       },
     });
 

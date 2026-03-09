@@ -16,6 +16,7 @@ const UpdateExhibitionSchema = z.object({
   image: z.string().min(1).optional(),
   year: z.string().optional(),
   published: z.boolean().optional(),
+  showOnHome: z.boolean().optional(),
 });
 
 /**

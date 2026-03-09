@@ -122,7 +122,7 @@ model Media {
   @@map("media")
 }
 
-// Exhibition items (for Home page)
+// DEPRECATED: Use WorkExhibition with showOnHome=true instead. Kept for migration safety.
 model ExhibitionItem {
   id        String   @id @default(cuid())
   sectionId String   @map("section_id")
@@ -243,7 +243,8 @@ model WorkExhibition {
   image     String // 전시 이미지 경로
   year      String   @default("2025") // 연도
   order     Int      @default(0) // 표시 순서
-  published Boolean  @default(true) // 공개 여부
+  published  Boolean  @default(true) // 공개 여부
+  showOnHome Boolean  @default(false) @map("show_on_home") // 홈 페이지 노출 여부
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

@@ -291,7 +291,7 @@ export default function WorkArchive({
               className="flex flex-col gap-4 cursor-pointer transition-transform duration-300 ease-in-out hover:-translate-y-1"
             >
               {/* Exhibition Item Image */}
-              <div className="relative w-full aspect-4/3 bg-[#f0f0f0] rounded overflow-hidden">
+              <div className="relative w-full aspect-3/4 bg-[#f0f0f0] rounded overflow-hidden">
                 <Image
                   src={item.image}
                   alt={item.title}

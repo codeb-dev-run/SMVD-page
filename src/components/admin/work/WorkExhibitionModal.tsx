@@ -26,13 +26,14 @@ export default function WorkExhibitionModal({
   const [image, setImage] = useState('');
   const [year, setYear] = useState('2025');
   const [published, setPublished] = useState(true);
+  const [showOnHome, setShowOnHome] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // ---- Dirty State ----
   const formState = useMemo(() => ({
-    title, subtitle, artist, image, year, published,
-  }), [title, subtitle, artist, image, year, published]);
+    title, subtitle, artist, image, year, published, showOnHome,
+  }), [title, subtitle, artist, image, year, published, showOnHome]);
 
   const {
     isDirty,
@@ -54,6 +55,7 @@ export default function WorkExhibitionModal({
     setImage(snapshot.image);
     setYear(snapshot.year);
     setPublished(snapshot.published);
+    setShowOnHome(snapshot.showOnHome);
   }, [revert]);
 
   useEffect(() => {
@@ -65,6 +67,7 @@ export default function WorkExhibitionModal({
         setImage(exhibition.image);
         setYear(exhibition.year);
         setPublished(exhibition.published);
+        setShowOnHome(exhibition.showOnHome);
       } else {
         setTitle('');
         setSubtitle('');
@@ -72,6 +75,7 @@ export default function WorkExhibitionModal({
         setImage('');
         setYear('2025');
         setPublished(true);
+        setShowOnHome(false);
       }
       setError(null);
     }
@@ -110,6 +114,7 @@ export default function WorkExhibitionModal({
         image: image.trim(),
         year,
         published,
+        showOnHome,
       });
       onClose();
     } catch (err) {
@@ -215,17 +220,31 @@ export default function WorkExhibitionModal({
               )}
             </div>
 
-            <div className="flex items-center gap-2">
-              <input
-                id="exhibition-published"
-                type="checkbox"
-                checked={published}
-                onChange={(e) => setPublished(e.target.checked)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label htmlFor="exhibition-published" className="text-sm font-medium text-gray-700">
-                공개
-              </label>
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <input
+                  id="exhibition-published"
+                  type="checkbox"
+                  checked={published}
+                  onChange={(e) => setPublished(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="exhibition-published" className="text-sm font-medium text-gray-700">
+                  공개
+                </label>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  id="exhibition-show-on-home"
+                  type="checkbox"
+                  checked={showOnHome}
+                  onChange={(e) => setShowOnHome(e.target.checked)}
+                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                />
+                <label htmlFor="exhibition-show-on-home" className="text-sm font-medium text-gray-700">
+                  홈에 표시
+                </label>
+              </div>
             </div>
 
             {error && (

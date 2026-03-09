@@ -37,6 +37,7 @@ export interface WorkExhibitionData {
   year: string;
   order: number;
   published: boolean;
+  showOnHome: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -80,6 +81,7 @@ export interface CreateExhibitionInput {
   image: string;
   year?: string;
   published?: boolean;
+  showOnHome?: boolean;
 }
 
 export interface UpdateExhibitionInput {
@@ -89,6 +91,7 @@ export interface UpdateExhibitionInput {
   image?: string;
   year?: string;
   published?: boolean;
+  showOnHome?: boolean;
 }
 
 // ---- Hook ----
@@ -234,6 +237,7 @@ export function useWorkEditor(
       year: input.year || new Date().getFullYear().toString(),
       order: 0,
       published: input.published ?? true,
+      showOnHome: input.showOnHome ?? false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -474,6 +478,7 @@ async function syncExhibitions(
           image: item.image,
           year: item.year,
           published: item.published,
+          showOnHome: item.showOnHome,
         }),
         credentials: 'include',
       }).then(res => { if (!res.ok) throw new Error('전시 생성 실패'); })
@@ -498,6 +503,7 @@ async function syncExhibitions(
           image: item.image,
           year: item.year,
           published: item.published,
+          showOnHome: item.showOnHome,
         }),
         credentials: 'include',
       }).then(res => { if (!res.ok) throw new Error('전시 수정 실패'); })
