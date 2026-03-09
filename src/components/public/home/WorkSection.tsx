@@ -77,8 +77,12 @@ export default function WorkSection({
     const el = sectionTriggerRef.current;
     const content = contentRef.current;
     if (!el || !content) return;
+
+    // Target only cards, not filters
+    const cards = content.querySelectorAll('[data-work-card]');
+
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      gsap.set(content, { opacity: 1 });
+      gsap.set(cards, { opacity: 1 });
       setShowAllFilters(true);
       return;
     }
@@ -88,8 +92,8 @@ export default function WorkSection({
     let lastCatIdx = -1;
     let maxProgress = 0;
 
-    // Initial state: content hidden
-    gsap.set(content, { opacity: 0 });
+    // Initial state: cards hidden, filters visible
+    gsap.set(cards, { opacity: 0 });
 
     const trigger = ScrollTrigger.create({
       trigger: el,
@@ -104,7 +108,7 @@ export default function WorkSection({
         if (p < maxProgress) return;
         maxProgress = p;
 
-        // Dead zone: pinned but content stays hidden
+        // Dead zone: pinned but cards stay hidden
         if (p < DEAD_ZONE) return;
 
         // Map progress to category index
@@ -117,7 +121,7 @@ export default function WorkSection({
         if (catIdx !== lastCatIdx) {
           lastCatIdx = catIdx;
           // Kill any running fade tweens to prevent overlap
-          gsap.killTweensOf(content);
+          gsap.killTweensOf(cards);
 
           if (catIdx === 0) {
             // First category: fade in from hidden
@@ -125,11 +129,11 @@ export default function WorkSection({
               isCycling.current = true;
             }
             setActiveCategory(cycleOrder[0]);
-            gsap.fromTo(content, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power2.out' });
+            gsap.fromTo(cards, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power2.out' });
           } else {
             // Subsequent: fixed-duration fade out → swap → fade in
             const isLast = catIdx === cycleOrder.length - 1;
-            gsap.to(content, {
+            gsap.to(cards, {
               opacity: 0,
               duration: 0.25,
               ease: 'power2.in',
@@ -138,7 +142,7 @@ export default function WorkSection({
                 if (isLast) {
                   isCycling.current = false;
                 }
-                gsap.to(content, { opacity: 1, duration: 0.35, ease: 'power2.out' });
+                gsap.to(cards, { opacity: 1, duration: 0.35, ease: 'power2.out' });
               },
             });
           }
@@ -148,16 +152,16 @@ export default function WorkSection({
         animationDoneRef.current = true;
         isCycling.current = false;
         setActiveCategory('All');
-        gsap.killTweensOf(content);
+        gsap.killTweensOf(cards);
         trigger.kill();
         // Clear residual pin styles to restore sticky behavior
         gsap.set(el, { clearProps: 'all' });
-        gsap.set(content, { opacity: 1 });
+        gsap.set(cards, { opacity: 1 });
       },
     });
 
     return () => {
-      gsap.killTweensOf(content);
+      gsap.killTweensOf(cards);
       trigger.kill();
     };
   }, []);
@@ -170,13 +174,14 @@ export default function WorkSection({
       setActiveCategory(cat);
       return;
     }
-    gsap.to(content, {
+    const cards = content.querySelectorAll('[data-work-card]');
+    gsap.to(cards, {
       opacity: 0,
       duration: 0.25,
       ease: 'power2.in',
       onComplete: () => {
         setActiveCategory(cat);
-        gsap.to(content, { opacity: 1, duration: 0.3, ease: 'power2.out' });
+        gsap.to(cards, { opacity: 1, duration: 0.3, ease: 'power2.out' });
       },
     });
   }, [activeCategory]);
@@ -262,13 +267,12 @@ export default function WorkSection({
         </div>
       </div>
 
-      {/* Content (opacity controlled by GSAP) */}
+      {/* Content */}
       <div ref={contentRef} className="w-full max-w-[1440px] mx-auto">
         {/* Mobile/Tablet filter (horizontal, on top) */}
         <div className="flex lg:hidden flex-row gap-2 overflow-x-auto pb-2 mb-6">
           {filterButtons('text-[18px] sm:text-[22px]', false)}
         </div>
-
         {/* Grid: 3-col on desktop (col1=cards, col2=filter sticky, col3=cards), 2-col tablet, 1-col mobile */}
         <div role="list" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_auto_1fr] gap-x-0 sm:gap-x-8 lg:gap-x-[50px] gap-y-6 sm:gap-y-8 lg:gap-y-10">
           {/* Desktop: center filter in grid col 2, sticky */}
