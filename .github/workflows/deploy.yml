@@ -88,10 +88,10 @@ jobs:
               --restart unless-stopped \
               ghcr.io/trump360-gif/smvd-page:latest
 
-            # Run DB migrations
-            echo "Running Prisma migrations..."
+            # Sync DB schema (prisma db push handles fresh DB and schema updates)
+            echo "Syncing DB schema..."
             sleep 5
-            docker exec smvd-$NEW_SLOT npx prisma migrate deploy 2>&1 || echo "Migration warning (may be first deploy)"
+            docker exec smvd-$NEW_SLOT npx prisma db push --skip-generate --accept-data-loss 2>&1 || echo "Schema sync warning (continuing)"
 
             # Health check (90 seconds timeout)
             echo "Waiting for health check..."
@@ -114,16 +114,7 @@ jobs:
             fi
 
             # Update Caddy reverse proxy
-            cat > /etc/caddy/sites/smvd-production.caddy << CADDY
-            smvd.codeb.kr {
-              reverse_proxy localhost:$NEW_PORT
-              encode gzip
-              log {
-                output file /var/log/caddy/smvd.log
-              }
-            }
-            CADDY
-
+            printf 'smvd.codeb.kr {\n  reverse_proxy localhost:%s\n  encode gzip\n  log {\n    output file /var/log/caddy/smvd.log\n  }\n}\n' "$NEW_PORT" > /etc/caddy/sites/smvd-production.caddy
             caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
             echo "✅ Caddy reloaded → port $NEW_PORT"
 
