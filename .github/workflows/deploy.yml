@@ -1,0 +1,145 @@
+name: Deploy SMVD
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: trump360-gif/smvd-page
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy to server (Blue-Green)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 158.247.203.55
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: GHCR_TOKEN,GITHUB_ACTOR,IMAGE_TAG
+          script: |
+            set -e
+
+            echo "=== SMVD Blue-Green Deployment ==="
+
+            # Login to GHCR
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+
+            # Pull latest image
+            docker pull ghcr.io/trump360-gif/smvd-page:$IMAGE_TAG
+            docker tag ghcr.io/trump360-gif/smvd-page:$IMAGE_TAG ghcr.io/trump360-gif/smvd-page:latest
+
+            # Determine slots
+            CURRENT=$(cat /opt/smvd/.current_slot 2>/dev/null || echo "none")
+            if [ "$CURRENT" = "blue" ]; then
+              NEW_SLOT="green"
+              NEW_PORT=4151
+              OLD_SLOT="blue"
+              OLD_PORT=4150
+            else
+              NEW_SLOT="blue"
+              NEW_PORT=4150
+              OLD_SLOT="green"
+              OLD_PORT=4151
+            fi
+
+            echo "Current: $CURRENT → Deploying to: $NEW_SLOT (port $NEW_PORT)"
+
+            # Remove old container in target slot
+            docker rm -f smvd-$NEW_SLOT 2>/dev/null || true
+
+            # Start new container
+            docker run -d \
+              --name smvd-$NEW_SLOT \
+              --network smvd-network \
+              --env-file /opt/codeb/envs/smvd-production.env \
+              -p $NEW_PORT:3000 \
+              --restart unless-stopped \
+              ghcr.io/trump360-gif/smvd-page:latest
+
+            # Run DB migrations
+            echo "Running Prisma migrations..."
+            sleep 5
+            docker exec smvd-$NEW_SLOT npx prisma migrate deploy 2>&1 || echo "Migration warning (may be first deploy)"
+
+            # Health check (90 seconds timeout)
+            echo "Waiting for health check..."
+            HEALTHY=false
+            for i in $(seq 1 30); do
+              if curl -sf --max-time 5 http://localhost:$NEW_PORT/ > /dev/null 2>&1; then
+                echo "✅ Health check passed (attempt $i)"
+                HEALTHY=true
+                break
+              fi
+              echo "  Attempt $i/30 - not ready yet..."
+              sleep 3
+            done
+
+            if [ "$HEALTHY" = "false" ]; then
+              echo "❌ Health check failed! Collecting logs..."
+              docker logs smvd-$NEW_SLOT --tail 100
+              docker rm -f smvd-$NEW_SLOT
+              exit 1
+            fi
+
+            # Update Caddy reverse proxy
+            cat > /etc/caddy/sites/smvd-production.caddy << CADDY
+            smvd.codeb.kr {
+              reverse_proxy localhost:$NEW_PORT
+              encode gzip
+              log {
+                output file /var/log/caddy/smvd.log
+              }
+            }
+            CADDY
+
+            caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
+            echo "✅ Caddy reloaded → port $NEW_PORT"
+
+            # Stop old slot
+            docker rm -f smvd-$OLD_SLOT 2>/dev/null && echo "Removed old slot: $OLD_SLOT" || true
+
+            # Save current slot
+            echo "$NEW_SLOT" > /opt/smvd/.current_slot
+
+            echo ""
+            echo "✅ Deployment complete!"
+            echo "   Slot:   $NEW_SLOT"
+            echo "   Port:   $NEW_PORT"
+            echo "   URL:    http://smvd.codeb.kr"
+
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          IMAGE_TAG: ${{ github.sha }}

@@ -1,0 +1,17 @@
+.git
+.github
+.next
+node_modules
+npm-debug.log*
+.env*
+.DS_Store
+*.pem
+*.tsbuildinfo
+coverage
+e2e
+playwright-report
+test-results
+.playwright
+backups
+prisma/dev.db
+src/generated
