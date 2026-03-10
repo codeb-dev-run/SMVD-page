@@ -64,14 +64,14 @@ jobs:
             CURRENT=$(cat /opt/smvd/.current_slot 2>/dev/null || echo "none")
             if [ "$CURRENT" = "blue" ]; then
               NEW_SLOT="green"
-              NEW_PORT=4151
+              NEW_PORT=4153
               OLD_SLOT="blue"
-              OLD_PORT=4150
+              OLD_PORT=4152
             else
               NEW_SLOT="blue"
-              NEW_PORT=4150
+              NEW_PORT=4152
               OLD_SLOT="green"
-              OLD_PORT=4151
+              OLD_PORT=4153
             fi
 
             echo "Current: $CURRENT → Deploying to: $NEW_SLOT (port $NEW_PORT)"
