@@ -6,8 +6,8 @@ import {
 import { NewsEventArchive } from '@/components/public/news';
 import { prisma } from '@/lib/db';
 
-// ISR: regenerate every 5 minutes. Admin API calls revalidatePath() on mutations.
-export const revalidate = 300;
+// Dynamic rendering: skip DB pre-render at Docker build time
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'News & Event',

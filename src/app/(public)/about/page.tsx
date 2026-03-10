@@ -12,8 +12,8 @@ import {
   type AboutHistoryContent,
 } from '@/types/domain/section-content';
 
-// ISR: regenerate every 60 seconds for faster reflection of changes.
-export const revalidate = 60;
+/// Dynamic rendering: skip DB pre-render at Docker build time
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'About',

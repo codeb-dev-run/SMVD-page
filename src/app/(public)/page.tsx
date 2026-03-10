@@ -3,8 +3,8 @@ import { Header, VideoHero } from '@/components/public/home';
 import HomePageContent from './HomePageContent';
 import { normalizeMediaUrl } from '@/lib/media-url';
 
-// ISR: regenerate every 60 seconds. Admin API calls revalidatePath() on mutations.
-export const revalidate = 60;
+// Dynamic rendering: skip DB pre-render at Docker build time
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: '숙명여자대학교 시각영상디자인과',

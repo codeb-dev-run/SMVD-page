@@ -8,8 +8,8 @@ import { prisma } from '@/lib/db';
 import { SectionType } from '@/generated/prisma';
 import type { UndergraduateContent, GraduateContent } from '@/lib/validation/curriculum';
 
-// ISR: regenerate every 10 minutes. Curriculum changes very infrequently.
-export const revalidate = 600;
+/// Dynamic rendering: skip DB pre-render at Docker build time
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Curriculum',
