@@ -38,14 +38,15 @@ export async function generateMetadata(
 }
 
 export async function generateStaticParams() {
-  const articles = await prisma.newsEvent.findMany({
-    select: { slug: true },
-    where: { published: true },
-  });
-  
-  return articles.map((article) => ({
-    id: article.slug,
-  }));
+  try {
+    const articles = await prisma.newsEvent.findMany({
+      select: { slug: true },
+      where: { published: true },
+    });
+    return articles.map((article) => ({ id: article.slug }));
+  } catch {
+    return [];
+  }
 }
 
 // ---- Types ----

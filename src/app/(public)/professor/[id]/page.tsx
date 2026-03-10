@@ -41,14 +41,15 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  const professors = await prisma.people.findMany({
-    select: { id: true },
-    where: { archivedAt: null, role: { not: 'instructor' } },
-  });
-  
-  return professors.map((prof) => ({
-    id: prof.id,
-  }));
+  try {
+    const professors = await prisma.people.findMany({
+      select: { id: true },
+      where: { archivedAt: null, role: { not: 'instructor' } },
+    });
+    return professors.map((prof) => ({ id: prof.id }));
+  } catch {
+    return [];
+  }
 }
 
 export default async function ProfessorDetailPage({

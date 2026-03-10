@@ -40,21 +40,24 @@ export async function generateMetadata(
 }
 
 export async function generateStaticParams() {
-  const projects = await prisma.workProject.findMany({
-    select: { slug: true },
-    where: { published: true },
-  });
-  
-  const params = projects.map((project) => ({
-    id: project.slug,
-  }));
+  try {
+    const projects = await prisma.workProject.findMany({
+      select: { slug: true },
+      where: { published: true },
+    });
 
-  // Legacy numeric slug paths for backward compatibility
-  Object.keys(LEGACY_SLUG_MAP).forEach((oldSlug) => {
-    params.push({ id: oldSlug });
-  });
+    const params = projects.map((project) => ({ id: project.slug }));
 
-  return params;
+    // Legacy numeric slug paths for backward compatibility
+    Object.keys(LEGACY_SLUG_MAP).forEach((oldSlug) => {
+      params.push({ id: oldSlug });
+    });
+
+    return params;
+  } catch {
+    // Legacy slug paths still available even without DB at build time
+    return Object.keys(LEGACY_SLUG_MAP).map((oldSlug) => ({ id: oldSlug }));
+  }
 }
 
 async function getProjectFromDB(slug: string): Promise<WorkDetail | null> {
