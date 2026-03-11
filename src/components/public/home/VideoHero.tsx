@@ -23,7 +23,7 @@ const YOUTUBE_IDS = {
 };
 
 const youtubeEmbedUrl = (id: string) =>
-  `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&controls=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&disablekb=1&fs=0&enablejsapi=1`;
+  `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&rel=0&iv_load_policy=3&modestbranding=1&playsinline=1&disablekb=1&fs=0&showinfo=0&enablejsapi=1`;
 
 export default function VideoHero({ animateOnMount = true, className }: VideoHeroProps) {
   const [glassMode, setGlassMode] = useState<'A' | 'B' | 'C'>('A');
@@ -372,12 +372,12 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
 
       {/* YouTube default (circle) — 시안 C */}
       {glassMode === 'C' && (
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden bg-white">
           <iframe
             id="yt-default-bg"
             src={youtubeEmbedUrl(YOUTUBE_IDS.default)}
             className="absolute border-0"
-            style={{ top: '-5%', left: '-5%', width: '110%', height: '110%', pointerEvents: 'none' }}
+            style={{ top: '-15%', left: '-15%', width: '130%', height: '130%', pointerEvents: 'none' }}
             allow="autoplay; encrypted-media"
             title="Hero default background"
           />
@@ -388,14 +388,14 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
       {glassMode === 'C' && (
         <div
           ref={hoverYtRef}
-          className="absolute inset-0 overflow-hidden"
+          className="absolute inset-0 overflow-hidden bg-white"
           style={{ opacity: 0 }}
         >
           <iframe
             id="yt-hover-bg"
             src={youtubeEmbedUrl(YOUTUBE_IDS.hover)}
             className="absolute border-0"
-            style={{ top: '-5%', left: '-5%', width: '110%', height: '110%', pointerEvents: 'none' }}
+            style={{ top: '-15%', left: '-15%', width: '130%', height: '130%', pointerEvents: 'none' }}
             allow="autoplay; encrypted-media"
             title="Hero hover wave"
           />

@@ -265,7 +265,7 @@ export function Header({ navigation, headerConfig, animateOnMount = true }: Head
                       </svg>
                     </button>
                     {mobileExpanded === item.label && (
-                      <div className="flex flex-col gap-1 pl-4">
+                      <div className="flex flex-col gap-1">
                         {item.children.map((child) => (
                           <Link
                             key={child.href}
