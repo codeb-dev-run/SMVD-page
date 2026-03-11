@@ -376,8 +376,8 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
           <iframe
             id="yt-default-bg"
             src={youtubeEmbedUrl(YOUTUBE_IDS.default)}
-            className="absolute border-0"
-            style={{ top: '-15%', left: '-15%', width: '130%', height: '130%', pointerEvents: 'none' }}
+            className="absolute inset-0 w-full h-full border-0"
+            style={{ pointerEvents: 'none', transform: 'scale(1.8)', transformOrigin: 'center center' }}
             allow="autoplay; encrypted-media"
             title="Hero default background"
           />
@@ -394,8 +394,8 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
           <iframe
             id="yt-hover-bg"
             src={youtubeEmbedUrl(YOUTUBE_IDS.hover)}
-            className="absolute border-0"
-            style={{ top: '-15%', left: '-15%', width: '130%', height: '130%', pointerEvents: 'none' }}
+            className="absolute inset-0 w-full h-full border-0"
+            style={{ pointerEvents: 'none', transform: 'scale(1.8)', transformOrigin: 'center center' }}
             allow="autoplay; encrypted-media"
             title="Hero hover wave"
           />
