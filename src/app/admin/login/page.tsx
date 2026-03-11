@@ -16,11 +16,22 @@ export default function LoginPage() {
   );
 }
 
+const ERROR_MESSAGES: Record<string, string> = {
+  CredentialsMissing: '이메일과 비밀번호를 입력하세요',
+  InvalidCredentials: '유효하지 않은 이메일 또는 비밀번호',
+  UserNotFound: '등록되지 않은 사용자입니다',
+  InvalidPassword: '비밀번호가 일치하지 않습니다',
+  RateLimitExceeded: '로그인 시도가 너무 많습니다. 15분 후 다시 시도해주세요.',
+};
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const urlError = searchParams.get('error');
+  const [error, setError] = useState<string | null>(
+    urlError ? (ERROR_MESSAGES[urlError] ?? '로그인 중 오류가 발생했습니다') : null
+  );
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -31,19 +42,20 @@ function LoginForm() {
     setIsLoading(true);
     setError(null);
 
-    try {
-      // NextAuth가 자동으로 세션 동기화 후 리다이렉트
-      await signIn('credentials', {
-        email,
-        password,
-        redirect: true,
-        callbackUrl: callbackUrl,
-      });
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : '로그인 중 오류가 발생했습니다';
-      setError(errorMsg);
+    const result = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      setError(ERROR_MESSAGES[result.error] ?? '로그인 중 오류가 발생했습니다');
       setIsLoading(false);
+      return;
     }
+
+    router.push(callbackUrl);
+    router.refresh();
   };
 
   return (

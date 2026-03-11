@@ -34,13 +34,13 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("이메일과 비밀번호를 입력하세요");
+          throw new Error("CredentialsMissing");
         }
 
         // Validate credentials schema first
         const validatedCredentials = LoginSchema.safeParse(credentials);
         if (!validatedCredentials.success) {
-          throw new Error("유효하지 않은 이메일 또는 비밀번호");
+          throw new Error("InvalidCredentials");
         }
 
         // Find user in database
@@ -49,7 +49,7 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user) {
-          throw new Error("등록되지 않은 사용자입니다");
+          throw new Error("UserNotFound");
         }
 
         // Verify password
@@ -63,9 +63,9 @@ export const authOptions: NextAuthOptions = {
         if (!isPasswordValid) {
           const { success: rateLimitOk } = await loginRatelimit.limit(rateLimitKey);
           if (!rateLimitOk) {
-            throw new Error("로그인 시도가 너무 많습니다. 15분 후 다시 시도해주세요.");
+            throw new Error("RateLimitExceeded");
           }
-          throw new Error("비밀번호가 일치하지 않습니다");
+          throw new Error("InvalidPassword");
         }
 
         // Return user object if credentials are valid
