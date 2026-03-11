@@ -330,7 +330,7 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`relative w-full h-[40vh] sm:h-[50vh] lg:h-[949px] overflow-hidden mb-10${className ? ` ${className}` : ''}`}
+      className={`relative w-full h-[40vh] sm:h-[50vh] lg:h-[949px] overflow-hidden mb-10 bg-white${className ? ` ${className}` : ''}`}
     >
       {/* SVG filter for Mockup A: barrel distortion via displacement map */}
       {barrelMapUrl && (

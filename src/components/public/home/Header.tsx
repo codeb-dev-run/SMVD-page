@@ -59,6 +59,7 @@ export function Header({ navigation, headerConfig, animateOnMount = true }: Head
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -232,28 +233,90 @@ export function Header({ navigation, headerConfig, animateOnMount = true }: Head
             className="flex flex-col p-5 sm:p-10 gap-6"
           >
             {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  height: '48px',
-                  padding: '0 20px',
-                  fontSize: '18px',
-                  fontWeight: '500',
-                  fontFamily: 'Helvetica',
-                  textDecoration: 'none',
-                  border: '1px solid #141414ff',
-                  backgroundColor: isActive(item.href) ? '#141414ff' : '#ffffffff',
-                  color: isActive(item.href) ? '#ffffffff' : '#141414ff',
-                  borderRadius: '0px',
-                  width: 'fit-content',
-                }}
-              >
-                {item.label}
-              </Link>
+              <div key={item.href} className="flex flex-col gap-2">
+                {item.children ? (
+                  <>
+                    <button
+                      onClick={() => setMobileExpanded(mobileExpanded === item.label ? null : item.label)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        height: '48px',
+                        padding: '0 20px',
+                        fontSize: '18px',
+                        fontWeight: '500',
+                        fontFamily: 'Helvetica',
+                        border: '1px solid #141414ff',
+                        backgroundColor: isActive(item.href) ? '#141414ff' : '#ffffffff',
+                        color: isActive(item.href) ? '#ffffffff' : '#141414ff',
+                        borderRadius: '0px',
+                        width: 'fit-content',
+                        minWidth: '180px',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {item.label}
+                      <svg
+                        width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        style={{ marginLeft: '8px', transform: mobileExpanded === item.label ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
+                      >
+                        <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                    {mobileExpanded === item.label && (
+                      <div className="flex flex-col gap-1 pl-4">
+                        {item.children.map((child) => (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            onClick={() => { setIsMobileMenuOpen(false); setMobileExpanded(null); }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              height: '40px',
+                              padding: '0 16px',
+                              fontSize: '15px',
+                              fontWeight: '400',
+                              fontFamily: 'Helvetica',
+                              textDecoration: 'none',
+                              border: '1px solid #e5e7eb',
+                              backgroundColor: '#ffffffff',
+                              color: '#141414ff',
+                              borderRadius: '0px',
+                              width: 'fit-content',
+                            }}
+                          >
+                            {child.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    href={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      height: '48px',
+                      padding: '0 20px',
+                      fontSize: '18px',
+                      fontWeight: '500',
+                      fontFamily: 'Helvetica',
+                      textDecoration: 'none',
+                      border: '1px solid #141414ff',
+                      backgroundColor: isActive(item.href) ? '#141414ff' : '#ffffffff',
+                      color: isActive(item.href) ? '#ffffffff' : '#141414ff',
+                      borderRadius: '0px',
+                      width: 'fit-content',
+                    }}
+                  >
+                    {item.label}
+                  </Link>
+                )}
+              </div>
             ))}
           </nav>
         </div>
