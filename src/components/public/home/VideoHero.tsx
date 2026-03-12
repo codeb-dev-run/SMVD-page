@@ -385,9 +385,9 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
             allow="autoplay; encrypted-media"
             title="Hero default background"
           />
-          {/* White vignette frame to hide YouTube black edges */}
+          {/* White vignette frame to shrink visible circle area */}
           <div className="absolute inset-0 pointer-events-none" style={{
-            background: 'radial-gradient(ellipse 70% 70% at center, transparent 40%, white 75%)',
+            background: 'radial-gradient(ellipse 50% 50% at center, transparent 25%, white 55%)',
           }} />
         </div>
       )}
