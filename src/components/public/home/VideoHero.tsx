@@ -391,13 +391,13 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
             id="yt-default-bg"
             src={youtubeEmbedUrl(YOUTUBE_IDS.default)}
             className="absolute inset-0 w-full h-full border-0"
-            style={{ pointerEvents: 'none', transform: 'scale(1.8)', transformOrigin: 'center center' }}
+            style={{ pointerEvents: 'none', transform: 'scale(1.2)', transformOrigin: 'center center' }}
             allow="autoplay; encrypted-media"
             title="Hero default background"
           />
-          {/* White vignette frame to shrink visible circle area (circle for true round shape) */}
+          {/* White vignette to hide YouTube black bars + shrink circle */}
           <div className="absolute inset-0 pointer-events-none" style={{
-            background: 'radial-gradient(circle at center, transparent 15%, white 30%)',
+            background: 'radial-gradient(circle at center, transparent 18%, white 35%)',
           }} />
         </div>
       )}
