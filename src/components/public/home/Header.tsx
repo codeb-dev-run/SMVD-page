@@ -105,7 +105,7 @@ export function Header({ navigation, headerConfig, animateOnMount = true }: Head
         className="w-[36px] h-[36px] sm:w-[42px] sm:h-[42px] mr-auto flex items-center justify-center relative no-underline border-none outline-none"
       >
         {headerConfig?.logoImagePath ? (
-          <Image
+          <img
             src={headerConfig.logoImagePath}
             alt="Logo"
             width={42}
