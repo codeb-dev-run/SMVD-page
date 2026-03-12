@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import type { Professor } from '@/components/public/people/types';
 import ProfessorDetailContent from './content';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,

@@ -3,8 +3,7 @@ import { Header, VideoHero } from '@/components/public/home';
 import HomePageContent from './HomePageContent';
 import { normalizeMediaUrl } from '@/lib/media-url';
 
-// Dynamic rendering: skip DB pre-render at Docker build time
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: '숙명여자대학교 시각영상디자인과',

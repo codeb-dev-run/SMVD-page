@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
 import {
   Header,
   Footer,

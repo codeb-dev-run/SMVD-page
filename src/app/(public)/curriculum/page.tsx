@@ -6,6 +6,8 @@ import {
 import CurriculumContent from './content';
 import { prisma } from '@/lib/db';
 import { SectionType } from '@/generated/prisma';
+
+export const dynamic = 'force-dynamic';
 import type { UndergraduateContent, GraduateContent } from '@/lib/validation/curriculum';
 
 /// Dynamic rendering: skip DB pre-render at Docker build time

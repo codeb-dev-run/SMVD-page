@@ -6,8 +6,7 @@ import {
 import { NewsEventArchive } from '@/components/public/news';
 import { prisma } from '@/lib/db';
 
-// Dynamic rendering: skip DB pre-render at Docker build time
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'News & Event',
