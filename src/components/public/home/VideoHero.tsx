@@ -334,7 +334,7 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`relative w-full h-[40vh] sm:h-[50vh] lg:h-[700px] overflow-hidden mb-10 bg-white${className ? ` ${className}` : ''}`}
+      className={`relative w-full h-[40vh] sm:h-[50vh] lg:h-[949px] overflow-hidden mb-10 bg-white${className ? ` ${className}` : ''}`}
     >
       {/* SVG filter for Mockup A: barrel distortion via displacement map */}
       {barrelMapUrl && (
@@ -355,6 +355,7 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
         muted
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
+        style={{ transform: 'scale(0.75)', transformOrigin: 'center center' }}
       >
         <source src="/videos/hero-default.webm" type="video/webm" />
         <source src="/videos/hero-default.mp4" type="video/mp4" />
@@ -368,7 +369,7 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
         playsInline
         preload="none"
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ opacity: 0 }}
+        style={{ opacity: 0, transform: 'scale(0.75)', transformOrigin: 'center center' }}
       >
         <source src="/videos/hero-hover.webm" type="video/webm" />
         <source src="/videos/hero-hover.mp4" type="video/mp4" />
@@ -381,13 +382,13 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
             id="yt-default-bg"
             src={youtubeEmbedUrl(YOUTUBE_IDS.default)}
             className="absolute inset-0 w-full h-full border-0"
-            style={{ pointerEvents: 'none', transform: 'scale(1.8)', transformOrigin: 'center center' }}
+            style={{ pointerEvents: 'none', transform: 'scale(1.35)', transformOrigin: 'center center' }}
             allow="autoplay; encrypted-media"
             title="Hero default background"
           />
           {/* White vignette frame to hide YouTube black edges */}
           <div className="absolute inset-0 pointer-events-none" style={{
-            background: 'radial-gradient(ellipse 70% 70% at center, transparent 40%, white 75%)',
+            background: 'radial-gradient(ellipse 55% 55% at center, transparent 35%, white 65%)',
           }} />
         </div>
       )}
@@ -403,13 +404,13 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
             id="yt-hover-bg"
             src={youtubeEmbedUrl(YOUTUBE_IDS.hover)}
             className="absolute inset-0 w-full h-full border-0"
-            style={{ pointerEvents: 'none', transform: 'scale(1.8)', transformOrigin: 'center center' }}
+            style={{ pointerEvents: 'none', transform: 'scale(1.35)', transformOrigin: 'center center' }}
             allow="autoplay; encrypted-media"
             title="Hero hover wave"
           />
           {/* White vignette frame to hide YouTube black edges */}
           <div className="absolute inset-0 pointer-events-none" style={{
-            background: 'radial-gradient(ellipse 70% 70% at center, transparent 40%, white 75%)',
+            background: 'radial-gradient(ellipse 55% 55% at center, transparent 35%, white 65%)',
           }} />
         </div>
       )}
