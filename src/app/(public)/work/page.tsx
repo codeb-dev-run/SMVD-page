@@ -46,7 +46,7 @@ async function getWorkData() {
           category: p.category,
           title: p.title,
           date: p.year,
-          image: p.thumbnailImage,
+          image: p.thumbnailImage || '/Group-27.svg',
           subtitle: p.subtitle,
         })),
         exhibitions: exhibitions.map((e) => ({

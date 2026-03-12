@@ -248,13 +248,13 @@ export default function WorkArchive({
             <Link key={item.id} href={`/work/${item.id}`} prefetch={true}>
               <div className="flex flex-col gap-[10px] cursor-pointer transition-transform duration-300 ease-in-out hover:-translate-y-1">
                 {/* Portfolio Item Image */}
-                <div className="relative w-full aspect-4/3 bg-[#f0f0f0] rounded overflow-hidden">
+                <div className="relative w-full aspect-4/3 bg-[#f0f0f0] rounded overflow-hidden flex items-center justify-center">
                   <Image
                     src={item.image}
                     alt={item.title}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    style={{ objectFit: 'cover' }}
+                    style={{ objectFit: item.image === '/Group-27.svg' ? 'contain' : 'cover', padding: item.image === '/Group-27.svg' ? '2rem' : '0' }}
                     quality={75}
                   />
                 </div>
