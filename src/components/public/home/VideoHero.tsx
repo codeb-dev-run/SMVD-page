@@ -223,6 +223,10 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
     gsap.set(inner, { x: -(x * MAGNIFICATION) + half, y: -(y * MAGNIFICATION) + half });
 
     const hoverTarget = glassModeRef.current === 'C' ? hoverYtRef.current : hoverVideoRef.current;
+    // Start hover video playback on first activate (lazy loaded with preload="none")
+    if (glassModeRef.current !== 'C' && hoverVideoRef.current && hoverVideoRef.current.paused) {
+      hoverVideoRef.current.play().catch(() => {});
+    }
     if (hoverTarget) gsap.to(hoverTarget, { opacity: 1, duration: 0.6, ease: 'power2.inOut', overwrite: 'auto' });
     gsap.to(mag, { opacity: 1, duration: 0.3, ease: 'power2.out', delay: 0.1, overwrite: 'auto' });
   }, []);
@@ -330,7 +334,7 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`relative w-full h-[40vh] sm:h-[50vh] lg:h-[949px] overflow-hidden mb-10 bg-white${className ? ` ${className}` : ''}`}
+      className={`relative w-full h-[40vh] sm:h-[50vh] lg:h-[700px] overflow-hidden mb-10 bg-white${className ? ` ${className}` : ''}`}
     >
       {/* SVG filter for Mockup A: barrel distortion via displacement map */}
       {barrelMapUrl && (
@@ -359,10 +363,10 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
       {/* Hover video (wave) - fades in when mouse over title */}
       <video
         ref={hoverVideoRef}
-        autoPlay
         loop
         muted
         playsInline
+        preload="none"
         className="absolute inset-0 w-full h-full object-cover"
         style={{ opacity: 0 }}
       >
@@ -381,6 +385,10 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
             allow="autoplay; encrypted-media"
             title="Hero default background"
           />
+          {/* White vignette frame to hide YouTube black edges */}
+          <div className="absolute inset-0 pointer-events-none" style={{
+            background: 'radial-gradient(ellipse 70% 70% at center, transparent 40%, white 75%)',
+          }} />
         </div>
       )}
 
@@ -399,6 +407,10 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
             allow="autoplay; encrypted-media"
             title="Hero hover wave"
           />
+          {/* White vignette frame to hide YouTube black edges */}
+          <div className="absolute inset-0 pointer-events-none" style={{
+            background: 'radial-gradient(ellipse 70% 70% at center, transparent 40%, white 75%)',
+          }} />
         </div>
       )}
 
@@ -449,6 +461,7 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
               loop
               muted
               playsInline
+              preload="none"
               className="absolute inset-0 w-full h-full object-cover"
             >
               <source src="/videos/hero-hover.webm" type="video/webm" />

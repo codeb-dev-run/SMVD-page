@@ -13,7 +13,7 @@ import {
 } from '@/types/domain/section-content';
 
 /// Dynamic rendering: skip DB pre-render at Docker build time
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'About',

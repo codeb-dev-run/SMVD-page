@@ -79,6 +79,16 @@ const nextConfig: NextConfig = {
         },
       ],
     },
+    {
+      // Cache video files aggressively
+      source: "/videos/(.*)",
+      headers: [
+        {
+          key: "Cache-Control",
+          value: "public, max-age=31536000, immutable",
+        },
+      ],
+    },
   ],
   // Powered by header removed for security
   poweredByHeader: false,
