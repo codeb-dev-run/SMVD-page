@@ -36,6 +36,7 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
   const titleRef = useRef<HTMLHeadingElement>(null);
   const isActive = useRef(false);
   const hoverYtRef = useRef<HTMLDivElement>(null);
+  const vignetteRef = useRef<HTMLDivElement>(null);
   const glassModeRef = useRef<'A' | 'B' | 'C'>('A');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const ytPlayersRef = useRef<any[]>([]);
@@ -228,6 +229,7 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
       hoverVideoRef.current.play().catch(() => {});
     }
     if (hoverTarget) gsap.to(hoverTarget, { opacity: 1, duration: 0.6, ease: 'power2.inOut', overwrite: 'auto' });
+    if (vignetteRef.current) gsap.to(vignetteRef.current, { opacity: 0, duration: 0.6, ease: 'power2.inOut', overwrite: 'auto' });
     gsap.to(mag, { opacity: 1, duration: 0.3, ease: 'power2.out', delay: 0.1, overwrite: 'auto' });
   }, []);
 
@@ -243,6 +245,7 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
 
     const hoverTarget = glassModeRef.current === 'C' ? hoverYtRef.current : hoverVideoRef.current;
     if (hoverTarget) gsap.to(hoverTarget, { opacity: 0, duration: 0.4, ease: 'power2.inOut', overwrite: 'auto' });
+    if (vignetteRef.current) gsap.to(vignetteRef.current, { opacity: 1, duration: 0.4, ease: 'power2.inOut', overwrite: 'auto' });
     if (magnifierRef.current) {
       gsap.to(magnifierRef.current, {
         opacity: 0, duration: 0.3, ease: 'power2.out', overwrite: 'auto',
@@ -373,6 +376,13 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
         <source src="/videos/hero-hover.webm" type="video/webm" />
         <source src="/videos/hero-hover.mp4" type="video/mp4" />
       </video>
+
+      {/* White vignette overlay to shrink visible circle for 시안 A/B */}
+      {glassMode !== 'C' && (
+        <div ref={vignetteRef} className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(ellipse 55% 55% at center, transparent 35%, white 70%)',
+        }} />
+      )}
 
       {/* YouTube default (circle) — 시안 C */}
       {glassMode === 'C' && (
