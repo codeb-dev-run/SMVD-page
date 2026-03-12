@@ -253,7 +253,7 @@ export default function WorkArchive({
                     <img
                       src="/Group-27.svg"
                       alt={item.title}
-                      className="w-8 h-8 opacity-40"
+                      className="w-14 h-14 opacity-40"
                     />
                   ) : (
                     <Image
