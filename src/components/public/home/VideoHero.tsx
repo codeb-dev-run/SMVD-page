@@ -392,7 +392,7 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
         </div>
       )}
 
-      {/* YouTube hover (wave) — 시안 C */}
+      {/* YouTube hover (wave) — 시안 C: no vignette, full edge-to-edge */}
       {glassMode === 'C' && (
         <div
           ref={hoverYtRef}
@@ -407,10 +407,6 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
             allow="autoplay; encrypted-media"
             title="Hero hover wave"
           />
-          {/* White vignette frame to hide YouTube black edges */}
-          <div className="absolute inset-0 pointer-events-none" style={{
-            background: 'radial-gradient(ellipse 70% 70% at center, transparent 40%, white 75%)',
-          }} />
         </div>
       )}
 
