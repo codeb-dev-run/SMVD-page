@@ -148,14 +148,22 @@ export default function NewsEventArchive({ items }: NewsEventArchiveProps) {
             >
             {/* Thumbnail Image */}
             <div className="relative w-[120px] h-[120px] min-w-[120px] sm:w-[140px] sm:h-[140px] sm:min-w-[140px] lg:w-40 lg:h-40 lg:min-w-40 bg-[#ebecf0] rounded overflow-hidden flex items-center justify-center">
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                sizes="160px"
-                className={item.image === '/Group-27.svg' ? 'object-contain p-8' : 'object-cover'}
-                quality={75}
-              />
+              {item.image === '/Group-27.svg' ? (
+                <img
+                  src="/Group-27.svg"
+                  alt={item.title}
+                  className="w-8 h-8 opacity-40"
+                />
+              ) : (
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  sizes="160px"
+                  className="object-cover"
+                  quality={75}
+                />
+              )}
             </div>
 
             {/* Content */}

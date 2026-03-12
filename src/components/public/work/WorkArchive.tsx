@@ -249,14 +249,22 @@ export default function WorkArchive({
               <div className="flex flex-col gap-[10px] cursor-pointer transition-transform duration-300 ease-in-out hover:-translate-y-1">
                 {/* Portfolio Item Image */}
                 <div className="relative w-full aspect-4/3 bg-[#f0f0f0] rounded overflow-hidden flex items-center justify-center">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    style={{ objectFit: item.image === '/Group-27.svg' ? 'contain' : 'cover', padding: item.image === '/Group-27.svg' ? '2rem' : '0' }}
-                    quality={75}
-                  />
+                  {item.image === '/Group-27.svg' ? (
+                    <img
+                      src="/Group-27.svg"
+                      alt={item.title}
+                      className="w-8 h-8 opacity-40"
+                    />
+                  ) : (
+                    <Image
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      style={{ objectFit: 'cover' }}
+                      quality={75}
+                    />
+                  )}
                 </div>
 
                 {/* Portfolio Item Info */}
