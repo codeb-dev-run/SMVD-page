@@ -380,7 +380,7 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
       {/* White vignette overlay to shrink visible circle for 시안 A/B */}
       {glassMode !== 'C' && (
         <div ref={vignetteRef} className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(ellipse 55% 55% at center, transparent 35%, white 70%)',
+          background: 'radial-gradient(circle at center, transparent 20%, white 40%)',
         }} />
       )}
 
@@ -395,9 +395,9 @@ export default function VideoHero({ animateOnMount = true, className }: VideoHer
             allow="autoplay; encrypted-media"
             title="Hero default background"
           />
-          {/* White vignette frame to shrink visible circle area */}
+          {/* White vignette frame to shrink visible circle area (circle for true round shape) */}
           <div className="absolute inset-0 pointer-events-none" style={{
-            background: 'radial-gradient(ellipse 50% 50% at center, transparent 25%, white 55%)',
+            background: 'radial-gradient(circle at center, transparent 15%, white 30%)',
           }} />
         </div>
       )}
