@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: trump360-gif/smvd-page
+  IMAGE_NAME: codeb-dev-run/smvd-page
 
 jobs:
   build-and-deploy:
@@ -57,8 +57,8 @@ jobs:
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
             # Pull latest image
-            docker pull ghcr.io/trump360-gif/smvd-page:$IMAGE_TAG
-            docker tag ghcr.io/trump360-gif/smvd-page:$IMAGE_TAG ghcr.io/trump360-gif/smvd-page:latest
+            docker pull ghcr.io/codeb-dev-run/smvd-page:$IMAGE_TAG
+            docker tag ghcr.io/codeb-dev-run/smvd-page:$IMAGE_TAG ghcr.io/codeb-dev-run/smvd-page:latest
 
             # Determine slots
             CURRENT=$(cat /opt/smvd/.current_slot 2>/dev/null || echo "none")
@@ -86,7 +86,7 @@ jobs:
               --env-file /opt/codeb/envs/smvd-production.env \
               -p $NEW_PORT:3000 \
               --restart unless-stopped \
-              ghcr.io/trump360-gif/smvd-page:latest
+              ghcr.io/codeb-dev-run/smvd-page:latest
 
             # Sync DB schema (prisma db push handles fresh DB and schema updates)
             echo "Syncing DB schema..."
