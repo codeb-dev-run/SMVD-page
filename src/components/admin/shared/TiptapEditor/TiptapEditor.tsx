@@ -11,7 +11,7 @@ import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { common, createLowlight } from 'lowlight';
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef, useState } from 'react';
 import { TiptapEditorProps, ImageUploadResult } from './types';
 import { TiptapContent, isTiptapContent } from '../BlockEditor/types';
 import { markdownToTiptapJSON, tiptapJSONToText } from '@/lib/tiptap/markdown-converter';
@@ -39,6 +39,51 @@ export default function TiptapEditor({
   const previousContentStringRef = useRef<string>('');
   const isInitializingRef = useRef(false);
   const isInternalChangeRef = useRef(false);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+
+  // Shared image upload helper
+  const uploadAndInsertImage = useCallback(async (file: File, editorInstance: ReturnType<typeof useEditor>) => {
+    if (!editorInstance || !file.type.startsWith('image/')) return;
+
+    uploadInProgressRef.current = true;
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Upload failed');
+
+      const result = await response.json();
+      if (result.success && result.data) {
+        editorInstance
+          .chain()
+          .focus()
+          .setImage({
+            src: result.data.path,
+            alt: result.data.altText || file.name,
+            width: result.data.width,
+            height: result.data.height,
+          })
+          .createParagraphNear()
+          .scrollIntoView()
+          .run();
+      }
+    } catch (error) {
+      console.error('Image upload error:', error);
+      alert('이미지 업로드에 실패했습니다');
+    } finally {
+      uploadInProgressRef.current = false;
+      if (editorInstance) {
+        const json = editorInstance.getJSON() as TiptapContent;
+        onChange(json);
+      }
+    }
+  }, [onChange]);
 
   // Initialize editor with proper extensions
   const editor = useEditor({
@@ -70,6 +115,8 @@ export default function TiptapEditor({
       }),
       Link.configure({
         openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
         HTMLAttributes: {
           class: 'tiptap-link',
         },
@@ -158,6 +205,48 @@ export default function TiptapEditor({
     }
   }, [editor, onChange]);
 
+  // Drag & drop handlers for images
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.types.includes('Files')) {
+      setIsDraggingOver(true);
+    }
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    const imageFiles = files.filter(f => f.type.startsWith('image/'));
+
+    if (imageFiles.length > 0 && editor) {
+      imageFiles.forEach(file => uploadAndInsertImage(file, editor));
+    }
+  }, [editor, uploadAndInsertImage]);
+
+  // Paste handler for images
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    const items = Array.from(e.clipboardData.items);
+    const imageItems = items.filter(item => item.type.startsWith('image/'));
+
+    if (imageItems.length > 0 && editor) {
+      e.preventDefault();
+      imageItems.forEach(item => {
+        const file = item.getAsFile();
+        if (file) uploadAndInsertImage(file, editor);
+      });
+    }
+  }, [editor, uploadAndInsertImage]);
+
   if (!editor) {
     return <div className="tiptap-editor-loading">Loading editor...</div>;
   }
@@ -178,7 +267,25 @@ export default function TiptapEditor({
         onUploadStart={handleImageUploadStart}
         onUploadEnd={handleImageUploadEnd}
       />
-      <div className="tiptap-editor-content">
+      <div
+        className={`tiptap-editor-content ${isDraggingOver ? 'tiptap-drag-over' : ''}`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        onPaste={handlePaste}
+      >
+        {isDraggingOver && (
+          <div className="tiptap-drop-overlay">
+            <div className="tiptap-drop-overlay-content">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              <p>이미지를 여기에 드롭하세요</p>
+            </div>
+          </div>
+        )}
         <EditorContent editor={editor} className="ProseMirror" />
       </div>
     </div>

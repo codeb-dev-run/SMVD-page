@@ -15,6 +15,7 @@ import {
   Code,
   Code2,
   Link2,
+  Unlink,
   Image,
   AlignLeft,
   AlignCenter,
@@ -42,9 +43,6 @@ export default function TiptapToolbar({
   onUploadStart,
   onUploadEnd,
 }: TiptapToolbarProps) {
-  const [linkInputVisible, setLinkInputVisible] = useState(false);
-  const [linkUrl, setLinkUrl] = useState('');
-
   // Force re-render on selection change so isActive('column') updates
   const [, setSelectionTick] = useState(0);
   useEffect(() => {
@@ -57,15 +55,23 @@ export default function TiptapToolbar({
     };
   }, [editor]);
 
-  const handleAddLink = useCallback(() => {
-    if (!linkUrl) {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+  const handleToggleLink = useCallback(() => {
+    if (editor.isActive('link')) {
+      // 이미 링크가 있으면 제거
+      editor.chain().focus().unsetLink().run();
     } else {
-      editor.chain().focus().extendMarkRange('link').setLink({ href: linkUrl }).run();
+      // 텍스트가 선택된 경우에만 링크 추가
+      const { from, to } = editor.state.selection;
+      if (from === to) {
+        alert('링크를 걸 텍스트를 먼저 선택해주세요');
+        return;
+      }
+      const url = window.prompt('링크 URL을 입력하세요');
+      if (url) {
+        editor.chain().focus().setLink({ href: url }).run();
+      }
     }
-    setLinkUrl('');
-    setLinkInputVisible(false);
-  }, [editor, linkUrl]);
+  }, [editor]);
 
   const handleImageUpload = useCallback(async () => {
     const input = document.createElement('input');
@@ -106,7 +112,7 @@ export default function TiptapToolbar({
         }
       } catch (error) {
         console.error('Image upload error:', error);
-        alert('Failed to upload image');
+        alert('이미지 업로드에 실패했습니다');
       } finally {
         onUploadEnd?.();
       }
@@ -117,13 +123,13 @@ export default function TiptapToolbar({
 
   return (
     <div className="tiptap-toolbar">
-      {/* Text Formatting */}
+      {/* 텍스트 서식 */}
       <div className="toolbar-group">
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
           disabled={!editor.can().chain().focus().toggleBold().run()}
           className={`toolbar-button ${editor.isActive('bold') ? 'active' : ''}`}
-          title="Bold (Ctrl+B)"
+          title="굵게 (Ctrl+B)"
         >
           <Bold size={18} />
         </button>
@@ -132,7 +138,7 @@ export default function TiptapToolbar({
           onClick={() => editor.chain().focus().toggleItalic().run()}
           disabled={!editor.can().chain().focus().toggleItalic().run()}
           className={`toolbar-button ${editor.isActive('italic') ? 'active' : ''}`}
-          title="Italic (Ctrl+I)"
+          title="기울임 (Ctrl+I)"
         >
           <Italic size={18} />
         </button>
@@ -140,7 +146,7 @@ export default function TiptapToolbar({
         <button
           onClick={() => editor.chain().focus().toggleUnderline().run()}
           className={`toolbar-button ${editor.isActive('underline') ? 'active' : ''}`}
-          title="Underline (Ctrl+U)"
+          title="밑줄 (Ctrl+U)"
         >
           <Underline size={18} />
         </button>
@@ -149,18 +155,18 @@ export default function TiptapToolbar({
           onClick={() => editor.chain().focus().toggleStrike().run()}
           disabled={!editor.can().chain().focus().toggleStrike().run()}
           className={`toolbar-button ${editor.isActive('strike') ? 'active' : ''}`}
-          title="Strikethrough"
+          title="취소선"
         >
           <Strikethrough size={18} />
         </button>
       </div>
 
-      {/* Headings */}
+      {/* 제목 */}
       <div className="toolbar-group">
         <button
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           className={`toolbar-button ${editor.isActive('heading', { level: 1 }) ? 'active' : ''}`}
-          title="Heading 1"
+          title="제목 1 (가장 큰 제목)"
         >
           <Heading1 size={18} />
         </button>
@@ -168,7 +174,7 @@ export default function TiptapToolbar({
         <button
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           className={`toolbar-button ${editor.isActive('heading', { level: 2 }) ? 'active' : ''}`}
-          title="Heading 2"
+          title="제목 2 (중간 제목)"
         >
           <Heading2 size={18} />
         </button>
@@ -176,18 +182,18 @@ export default function TiptapToolbar({
         <button
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
           className={`toolbar-button ${editor.isActive('heading', { level: 3 }) ? 'active' : ''}`}
-          title="Heading 3"
+          title="제목 3 (작은 제목)"
         >
           <Heading3 size={18} />
         </button>
       </div>
 
-      {/* Lists */}
+      {/* 목록 */}
       <div className="toolbar-group">
         <button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={`toolbar-button ${editor.isActive('bulletList') ? 'active' : ''}`}
-          title="Bullet List"
+          title="글머리 기호 목록"
         >
           <List size={18} />
         </button>
@@ -195,7 +201,7 @@ export default function TiptapToolbar({
         <button
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={`toolbar-button ${editor.isActive('orderedList') ? 'active' : ''}`}
-          title="Ordered List"
+          title="번호 매기기 목록"
         >
           <ListOrdered size={18} />
         </button>
@@ -203,19 +209,19 @@ export default function TiptapToolbar({
         <button
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
           className={`toolbar-button ${editor.isActive('blockquote') ? 'active' : ''}`}
-          title="Quote"
+          title="인용문"
         >
           <Quote size={18} />
         </button>
       </div>
 
-      {/* Code */}
+      {/* 코드 */}
       <div className="toolbar-group">
         <button
           onClick={() => editor.chain().focus().toggleCode().run()}
           disabled={!editor.can().chain().focus().toggleCode().run()}
           className={`toolbar-button ${editor.isActive('code') ? 'active' : ''}`}
-          title="Inline Code"
+          title="인라인 코드"
         >
           <Code size={18} />
         </button>
@@ -223,61 +229,37 @@ export default function TiptapToolbar({
         <button
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
           className={`toolbar-button ${editor.isActive('codeBlock') ? 'active' : ''}`}
-          title="Code Block"
+          title="코드 블록"
         >
           <Code2 size={18} />
         </button>
       </div>
 
-      {/* Media & Links */}
+      {/* 링크 & 이미지 */}
       <div className="toolbar-group">
-        <div className="toolbar-link-input">
-          <button
-            onClick={() => setLinkInputVisible(!linkInputVisible)}
-            className={`toolbar-button ${editor.isActive('link') ? 'active' : ''}`}
-            title="Link"
-          >
-            <Link2 size={18} />
-          </button>
-          {linkInputVisible && (
-            <div className="link-input-wrapper">
-              <input
-                type="text"
-                placeholder="https://example.com"
-                value={linkUrl}
-                onChange={(e) => setLinkUrl(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleAddLink();
-                  if (e.key === 'Escape') {
-                    setLinkInputVisible(false);
-                    setLinkUrl('');
-                  }
-                }}
-                autoFocus
-                className="link-input"
-              />
-              <button onClick={handleAddLink} className="link-submit">
-                Add
-              </button>
-            </div>
-          )}
-        </div>
+        <button
+          onClick={handleToggleLink}
+          className={`toolbar-button ${editor.isActive('link') ? 'active' : ''}`}
+          title={editor.isActive('link') ? '링크 제거' : '링크 삽입 (텍스트 선택 후 클릭)'}
+        >
+          {editor.isActive('link') ? <Unlink size={18} /> : <Link2 size={18} />}
+        </button>
 
         <button
           onClick={handleImageUpload}
           className="toolbar-button"
-          title="Insert Image"
+          title="이미지 삽입 (클릭 또는 에디터에 드래그앤드롭)"
         >
           <Image size={18} />
         </button>
       </div>
 
-      {/* Text Alignment */}
+      {/* 텍스트 정렬 */}
       <div className="toolbar-group">
         <button
           onClick={() => editor.chain().focus().setTextAlign('left').run()}
           className={`toolbar-button ${editor.isActive({ textAlign: 'left' }) ? 'active' : ''}`}
-          title="Align Left"
+          title="왼쪽 정렬"
         >
           <AlignLeft size={18} />
         </button>
@@ -285,7 +267,7 @@ export default function TiptapToolbar({
         <button
           onClick={() => editor.chain().focus().setTextAlign('center').run()}
           className={`toolbar-button ${editor.isActive({ textAlign: 'center' }) ? 'active' : ''}`}
-          title="Align Center"
+          title="가운데 정렬"
         >
           <AlignCenter size={18} />
         </button>
@@ -293,13 +275,13 @@ export default function TiptapToolbar({
         <button
           onClick={() => editor.chain().focus().setTextAlign('right').run()}
           className={`toolbar-button ${editor.isActive({ textAlign: 'right' }) ? 'active' : ''}`}
-          title="Align Right"
+          title="오른쪽 정렬"
         >
           <AlignRight size={18} />
         </button>
       </div>
 
-      {/* Column Layouts + Vertical Alignment */}
+      {/* 다단 레이아웃 + 세로 정렬 */}
       <div className="toolbar-group">
         <button
           onClick={() => editor.chain().focus().insertColumns(2).run()}
@@ -347,13 +329,13 @@ export default function TiptapToolbar({
         </button>
       </div>
 
-      {/* Undo/Redo */}
+      {/* 실행 취소/다시 실행 */}
       <div className="toolbar-group">
         <button
           onClick={() => editor.chain().focus().undo().run()}
           disabled={!editor.can().undo()}
           className="toolbar-button"
-          title="Undo (Ctrl+Z)"
+          title="실행 취소 (Ctrl+Z)"
         >
           <Undo2 size={18} />
         </button>
@@ -362,7 +344,7 @@ export default function TiptapToolbar({
           onClick={() => editor.chain().focus().redo().run()}
           disabled={!editor.can().redo()}
           className="toolbar-button"
-          title="Redo (Ctrl+Y)"
+          title="다시 실행 (Ctrl+Y)"
         >
           <Redo2 size={18} />
         </button>
