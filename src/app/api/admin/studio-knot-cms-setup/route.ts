@@ -4,17 +4,14 @@
  * POST /api/admin/studio-knot-cms-setup
  *
  * Generates and saves BlogContent JSON for Studio Knot project
- *
- * Note: This endpoint is exposed without auth for one-time setup
+ * Requires admin authentication
  */
 
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { Prisma } from "@/generated/prisma";
 import { logger } from "@/lib/logger";
-
-// Remove auth by not using middleware, or allow via env check
-const SETUP_TOKEN = process.env.STUDIO_KNOT_SETUP_TOKEN;
+import { checkAdminAuth } from "@/lib/auth-check";
 
 const studioKnotBlogContent = {
   version: "1.0",
@@ -63,7 +60,7 @@ const studioKnotBlogContent = {
       content: "STUDIO KNOT는 입지 않는 옷에 새로운 쓰임을 더해 반려견 장난감으로 재탄생시키는 업사이클링 터그 토이 브랜드입니다. 쉽게 버려지는 의류와 빠르게 닳는 반려견 장난감의 순환 구조를 개선하며, 보호자의 체취가 남은 옷으로 만든 토이는 정서적 가치를 담은 지속가능한 대안을 제시합니다.",
       fontSize: 18,
       fontWeight: "400",
-      fontFamily: "Pretendard",
+      fontFamily: "var(--font-suit), sans-serif",
       color: "#1b1d1f",
       lineHeight: 1.8,
       letterSpacing: 0.5
@@ -100,7 +97,10 @@ const studioKnotBlogContent = {
 
 export async function POST() {
   try {
-    if (process.env.DEBUG) console.log('[Phase 2] 🔍 Finding Studio Knot project...');
+    const authResult = await checkAdminAuth();
+    if (!authResult.authenticated) return authResult.error;
+
+    logger.info({ context: 'POST /api/admin/studio-knot-cms-setup' }, 'Finding Studio Knot project');
     const studioKnot = await prisma.workProject.findFirst({
       where: { title: "STUDIO KNOT" }
     });
@@ -112,15 +112,12 @@ export async function POST() {
       );
     }
 
-    if (process.env.DEBUG) console.log('[Phase 2] 📝 Updating database with BlogContent...');
     const updated = await prisma.workProject.update({
       where: { id: studioKnot.id },
       data: {
         content: studioKnotBlogContent as Prisma.InputJsonValue
       }
     });
-
-    if (process.env.DEBUG) console.log('[Phase 2] ✅ Database updated successfully');
 
     const contentData = updated.content as { blocks: unknown[]; rowConfig: unknown[]; } | null;
     return NextResponse.json({
@@ -135,9 +132,9 @@ export async function POST() {
       }
     });
   } catch (error) {
-    console.error('[Phase 2] Error:', error);
+    logger.error({ err: error, context: 'POST /api/admin/studio-knot-cms-setup' }, 'Setup error');
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

@@ -1,29 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { checkAdminAuth } from '@/lib/auth-check';
 
 export const dynamic = 'force-dynamic';
+
+interface NormalizeResult {
+  slug: string;
+  title: string;
+  status: 'normalized' | 'skipped';
+  preview?: string;
+  reason?: string;
+}
 
 /**
  * POST /api/admin/work/normalize-descriptions
  * Normalize work project descriptions from BlockEditor JSON to plain text
- * Secret parameter required for safety
+ * Admin authentication required
  */
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
-    // Simple protection: check secret parameter
-    const secret = req.nextUrl.searchParams.get('secret');
-    if (secret !== 'normalize-work-2026') {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    console.log('🔄 Starting work project description normalization...\n');
+    const authResult = await checkAdminAuth();
+    if (!authResult.authenticated) return authResult.error;
 
     const projects = await prisma.workProject.findMany();
-    const results: any[] = [];
+    const results: NormalizeResult[] = [];
     let normalizedCount = 0;
 
     for (const project of projects) {
@@ -35,10 +36,9 @@ export async function POST(req: NextRequest) {
         if (cleanDescription && typeof cleanDescription === 'string' && cleanDescription.trim().startsWith('{')) {
           const parsed = JSON.parse(cleanDescription);
           if (parsed?.blocks && Array.isArray(parsed.blocks)) {
-            // Extract text from text blocks
             const textBlocks = parsed.blocks
-              .filter((b: any) => b.type === 'text' && b.content)
-              .map((b: any) => b.content);
+              .filter((b: { type: string; content?: string }) => b.type === 'text' && b.content)
+              .map((b: { content: string }) => b.content);
 
             if (textBlocks.length > 0) {
               cleanDescription = textBlocks.join('\n\n');
@@ -46,11 +46,10 @@ export async function POST(req: NextRequest) {
             }
           }
         }
-      } catch (e) {
+      } catch {
         // Not JSON or parse error - keep as is
       }
 
-      // Update if normalized
       if (wasNormalized) {
         await prisma.workProject.update({
           where: { id: project.id },
@@ -61,9 +60,8 @@ export async function POST(req: NextRequest) {
           slug: project.slug,
           title: project.title,
           status: 'normalized',
-          preview: cleanDescription.substring(0, 60),
+          preview: cleanDescription?.substring(0, 60),
         });
-        console.log(`✅ ${project.slug}: "${cleanDescription.substring(0, 50)}..."`);
       } else {
         results.push({
           slug: project.slug,
@@ -71,7 +69,6 @@ export async function POST(req: NextRequest) {
           status: 'skipped',
           reason: 'Already plain text or empty',
         });
-        console.log(`⏭️  ${project.slug}: Already plain text or empty`);
       }
     }
 
@@ -88,7 +85,7 @@ export async function POST(req: NextRequest) {
           normalizedCount,
           results,
         },
-        message: `✨ Normalized ${normalizedCount} descriptions`,
+        message: `Normalized ${normalizedCount} descriptions`,
       },
       { status: 200 }
     );
@@ -98,7 +95,7 @@ export async function POST(req: NextRequest) {
       'Description normalization error'
     );
     return NextResponse.json(
-      { error: String(error) },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

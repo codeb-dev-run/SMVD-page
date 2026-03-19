@@ -57,8 +57,30 @@ export async function POST(request: NextRequest) {
     // 파일을 Buffer로 변환
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    // SVG는 검증 스킵 (XML 기반이므로 매직 바이트 검증 불필요)
-    if (file.type !== "image/svg+xml") {
+    if (file.type === "image/svg+xml") {
+      // SVG 보안 검증: XXE, 스크립트 삽입 차단
+      const svgContent = buffer.toString("utf-8");
+      const SVG_DANGEROUS_PATTERNS = [
+        /<!DOCTYPE/i,
+        /<!ENTITY/i,
+        /SYSTEM\s+["']/i,
+        /PUBLIC\s+["']/i,
+        /<script[\s>]/i,
+        /\son\w+\s*=/i,
+        /javascript\s*:/i,
+        /data\s*:\s*text\/html/i,
+        /<foreignObject[\s>]/i,
+      ];
+      for (const pattern of SVG_DANGEROUS_PATTERNS) {
+        if (pattern.test(svgContent)) {
+          return errorResponse(
+            "SVG 파일에 허용되지 않는 콘텐츠가 포함되어 있습니다",
+            "DANGEROUS_SVG_CONTENT",
+            400
+          );
+        }
+      }
+    } else {
       // 매직 바이트 검증 (파일 실제 내용 확인 - Content-Type 위조 방지)
       const fileValidation = validateFileContent(buffer, ALLOWED_TYPES);
       if (!fileValidation.valid) {
